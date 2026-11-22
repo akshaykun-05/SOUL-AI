@@ -4,7 +4,8 @@ from typing import Literal
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from .config import Settings
@@ -15,6 +16,7 @@ from .config import Settings
 # `uvicorn app.main:app` when started from the backend directory.
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = REPOSITORY_ROOT / "SOUL_AI"
+FRONTEND_DIST = REPOSITORY_ROOT / "dist"
 if str(ENGINE_ROOT) not in sys.path:
     sys.path.insert(0, str(ENGINE_ROOT))
 
@@ -71,6 +73,28 @@ def create_app(settings: Settings | None = None, engine_service=None) -> FastAPI
         ),
         prefix="/api",
     )
+
+    assets_dir = FRONTEND_DIST / "assets"
+    if (FRONTEND_DIST / "index.html").is_file() and assets_dir.is_dir():
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="frontend-assets")
+
+        @app.get("/", include_in_schema=False)
+        def frontend_index():
+            return FileResponse(FRONTEND_DIST / "index.html")
+
+        @app.get("/{path:path}", include_in_schema=False)
+        def frontend_routes(path: str):
+            # Keep unknown API requests as API 404s instead of returning HTML.
+            if path == "api" or path.startswith("api/"):
+                from fastapi import HTTPException
+
+                raise HTTPException(status_code=404, detail="API route not found")
+            requested_file = (FRONTEND_DIST / path).resolve()
+            if FRONTEND_DIST.resolve() in requested_file.parents and requested_file.is_file():
+                return FileResponse(requested_file)
+            # React Router owns client routes; direct navigation and refresh
+            # should return the built app shell.
+            return FileResponse(FRONTEND_DIST / "index.html")
 
     @app.middleware("http")
     async def enforce_upload_limits(request, call_next):

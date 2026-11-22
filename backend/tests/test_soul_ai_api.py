@@ -1,4 +1,5 @@
 import base64
+import re
 
 import pymupdf
 from fastapi.testclient import TestClient
@@ -119,3 +120,23 @@ def test_missing_model_key_returns_error_instead_of_a_fabricated_answer():
         })
         assert answer.status_code == 503
         assert "provider" in answer.json()["detail"].lower()
+
+
+def test_built_frontend_assets_and_client_routes_are_served_by_backend():
+    with TestClient(create_app(Settings(_env_file=None), SOULAIEngineService())) as client:
+        index = client.get("/")
+        assert index.status_code == 200
+        assert "/soul-ai-bridge.js" in index.text
+        assert client.get("/soul-ai-bridge.js").status_code == 200
+        asset_urls = re.findall(r'(?:src|href)="(/assets/[^"]+)"', index.text)
+        assert len(asset_urls) >= 2
+
+        for asset_url in asset_urls:
+            asset = client.get(asset_url)
+            assert asset.status_code == 200
+
+        # BrowserRouter direct links and refreshes return the SPA shell.
+        assert client.get("/verification").text == index.text
+        missing_api = client.get("/api/not-a-route")
+        assert missing_api.status_code == 404
+        assert missing_api.headers["content-type"].startswith("application/json")

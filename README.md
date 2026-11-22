@@ -16,32 +16,32 @@ Copy-Item backend/.env.example backend/.env
 
 Set `SOUL_LLM_API_KEY` in `backend/.env` or in the process environment. The claim extraction and independent verification passes use separately constructed provider instances. The app starts without a key so health checks and docs remain available, while answer requests return a configuration error until a key is provided. Never put a key in frontend code or commit `.env` files.
 
-## Start the backend
+## Start the application
 
-From the repository root:
+The FastAPI server hosts both the API and the built React frontend in `dist/`. Run from the repository root:
 
 ```powershell
 python -m uvicorn backend.app.main:app --reload
 ```
 
-The API and Swagger UI are at `http://127.0.0.1:8000/api/health` and `http://127.0.0.1:8000/docs`.
+Open the frontend at `http://127.0.0.1:8000/`. The API health endpoint is `http://127.0.0.1:8000/api/health`, and Swagger UI is at `http://127.0.0.1:8000/docs`.
 
-## Start the frontend
+The frontend's `/assets/...` URLs and React routes (for example `/overview`, `/documents`, `/upload`, `/verification`) are served by FastAPI. Direct navigation and refreshes fall back to `dist/index.html`. The small `dist/soul-ai-bridge.js` adapter connects the built upload flow and verification question panel to same-origin `/api/...` routes, so the built app does not need a separate frontend port or CORS configuration for local use.
 
-In a second terminal, from the repository root:
+The previous static HTML screens remain available separately at `frontend/page1.html` through `frontend/page11.html`. To run that legacy set with its standalone dev server, use a second terminal:
 
 ```powershell
 python frontend/serve.py
 ```
 
-Open `http://127.0.0.1:3000/page1.html`. To point the static frontend at another backend, set `SOUL_FRONTEND_API_URL` before starting its server. For example:
+Open `http://127.0.0.1:3000/page1.html`. To point those legacy pages at another backend, set `SOUL_FRONTEND_API_URL` before starting their server. For example:
 
 ```powershell
 $env:SOUL_FRONTEND_API_URL = "http://127.0.0.1:8000/api"
 python frontend/serve.py
 ```
 
-The frontend server injects that value through `/config.js`; the browser never receives the model API key. Backend origins are controlled by `SOUL_BACKEND_CORS_ORIGINS` in `backend/.env`.
+The legacy frontend server injects that value through `/config.js`; the browser never receives the model API key. Backend origins are controlled by `SOUL_BACKEND_CORS_ORIGINS` in `backend/.env`.
 
 ## Request flow
 
