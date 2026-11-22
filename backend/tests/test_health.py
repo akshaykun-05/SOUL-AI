@@ -6,11 +6,12 @@ from app.main import create_app
 
 
 @pytest.fixture
-def client(monkeypatch):
+def client(monkeypatch, tmp_path):
     monkeypatch.setenv("SOUL_BACKEND_SERVICE_NAME", "SOUL AI Test Backend")
     monkeypatch.setenv("SOUL_BACKEND_VERSION", "1.2.3")
     monkeypatch.setenv("SOUL_BACKEND_CORS_ORIGINS", '["http://localhost:5173"]')
-    with TestClient(create_app(Settings(_env_file=None))) as test_client:
+    database_url = f"sqlite:///{(tmp_path / 'health.sqlite3').as_posix()}"
+    with TestClient(create_app(Settings(_env_file=None, database_url=database_url))) as test_client:
         yield test_client
 
 
