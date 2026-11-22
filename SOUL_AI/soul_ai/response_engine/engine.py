@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from enum import Enum
-from typing import Mapping, Protocol, Sequence
+from typing import Literal, Mapping, Protocol, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -113,6 +113,17 @@ class ZeroGuessingResponse(BaseModel):
     claims: list[VerifiedAnswerClaim] = Field(default_factory=list)
     conflicts: list[ContradictionFinding] = Field(default_factory=list)
     requires_human_review: bool = False
+    # Internal evaluation trace; intentionally excluded from user/API JSON.
+    evaluation_trace: list["VerificationTraceEntry"] = Field(default_factory=list, exclude=True)
+
+
+class VerificationTraceEntry(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    scope: Literal["answer", "document"]
+    document_ids: list[str] = Field(default_factory=list)
+    claim: AtomicClaim
+    verification: ClaimVerificationResult
 
 
 class ZeroGuessingEngine:
@@ -154,12 +165,24 @@ class ZeroGuessingEngine:
             candidate = await self.claim_extractor.extract(question, retrieved)
         except Exception:
             candidate = None
+        evaluation_trace: list[VerificationTraceEntry] = []
         candidate_verifications: list[ClaimVerificationResult] = []
         if candidate is not None and candidate.claims:
             try:
                 candidate_verifications = await self.verifier.verify_many(candidate.claims, retrieved)
             except Exception:
                 candidate_verifications = []
+            candidate_by_id = {claim.claim_id: claim for claim in candidate.claims}
+            evaluation_trace.extend(
+                VerificationTraceEntry(
+                    scope="answer",
+                    document_ids=list(dict.fromkeys(source.document_id for source in retrieved)),
+                    claim=candidate_by_id[item.claim_id],
+                    verification=item,
+                )
+                for item in candidate_verifications
+                if item.claim_id in candidate_by_id
+            )
 
         # Extract and verify each document's answer facts separately. This finds
         # opposing supported values even if answer generation picked one side.
@@ -189,6 +212,17 @@ class ZeroGuessingEngine:
                 local_scan_uncertain = True
                 continue
             local_verifications.extend(reports)
+            local_by_id = {claim.claim_id: claim for claim in local.claims}
+            evaluation_trace.extend(
+                VerificationTraceEntry(
+                    scope="document",
+                    document_ids=list(dict.fromkeys(source.document_id for source in document_evidence)),
+                    claim=local_by_id[item.claim_id],
+                    verification=item,
+                )
+                for item in reports
+                if item.claim_id in local_by_id
+            )
             if (
                 len(reports) != len(local.claims)
                 or len({report.claim_id for report in reports}) != len(reports)
@@ -217,6 +251,7 @@ class ZeroGuessingEngine:
                 answer=self._conflict_answer(conflicts),
                 conflicts=conflicts,
                 requires_human_review=any(item.requires_human_review for item in conflicts),
+                evaluation_trace=evaluation_trace,
             )
 
         if (
@@ -225,11 +260,11 @@ class ZeroGuessingEngine:
             or not candidate.claims
             or local_scan_uncertain
         ):
-            return self._abstain()
+            return self._abstain(evaluation_trace)
 
         reports = {item.claim_id: item for item in candidate_verifications}
         if len(reports) != len(candidate.claims):
-            return self._abstain()
+            return self._abstain(evaluation_trace)
         verified_claims: list[VerifiedAnswerClaim] = []
         for claim in candidate.claims:
             report = reports.get(claim.claim_id)
@@ -241,7 +276,7 @@ class ZeroGuessingEngine:
                 or not report.evidence
                 or not self._citations_match(report.evidence, retrieved)
             ):
-                return self._abstain()
+                return self._abstain(evaluation_trace)
             verified_claims.append(
                 VerifiedAnswerClaim(
                     claim_id=claim.claim_id,
@@ -260,6 +295,7 @@ class ZeroGuessingEngine:
             status=ResponseStatus.answered,
             answer=answer,
             claims=verified_claims,
+            evaluation_trace=evaluation_trace,
         )
 
     @staticmethod
@@ -283,10 +319,13 @@ class ZeroGuessingEngine:
         )
 
     @staticmethod
-    def _abstain() -> ZeroGuessingResponse:
+    def _abstain(
+        trace: Sequence[VerificationTraceEntry] = (),
+    ) -> ZeroGuessingResponse:
         return ZeroGuessingResponse(
             status=ResponseStatus.insufficient_evidence,
             answer=INSUFFICIENT_EVIDENCE_MESSAGE,
+            evaluation_trace=list(trace),
         )
 
     @staticmethod

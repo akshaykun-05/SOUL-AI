@@ -1,6 +1,6 @@
-# SOUL AI - Phase 5
+# SOUL AI - Phase 6
 
-SOUL AI is an evidence-grounded document verification engine for Hack-A-Sol 5.0. It extracts page-aware PDF evidence, generates atomic claim candidates, independently verifies claims, detects cross-document conflicts, and abstains when it cannot support a factual answer.
+SOUL AI is an evidence-grounded document verification engine for Hack-A-Sol 5.0. It extracts page-aware PDF evidence, generates atomic claim candidates, independently verifies claims, detects cross-document conflicts, abstains when it cannot support an answer, and measures reliability with a reproducible 40-case benchmark.
 
 ## Architecture overview
 
@@ -29,6 +29,9 @@ Cross-document comparison of verified facts
 Citation-grounded answer or explicit abstention
         |
         v
+Separate honesty benchmark and dashboard metrics
+        |
+        v
 Versioned JSON contract -> separate FastAPI backend / React frontend
 ```
 
@@ -43,6 +46,10 @@ Implemented phases:
 - `verification/verifier.py` runs one dedicated verifier call per claim over every original evidence chunk. Candidate source IDs are not passed to the verifier. It validates filename, page, and each quoted snippet against original extracted text before returning citations.
 - `contradictions/detector.py` compares only `SUPPORTED` claims with checked source quotes. It matches normalized entities and attributes, normalizes common currencies, scaled numbers, percentages, dates, and payment periods, and returns both source snippets.
 - `response_engine/engine.py` coordinates lexical retrieval, candidate claim extraction, independent verification, per-document conflict checks, citation assembly, and abstention. It returns only verified claim text, not free-form candidate answer prose.
+- `evaluation/benchmark.py` scores outcomes, target-related claim verification trace entries, and citations against separate gold labels. Internal evaluation traces are excluded from normal response JSON.
+- `benchmark/data/inputs.json` stores the 40 model inputs. `benchmark/data/labels.json` stores expected outcomes and source facts separately; the runner passes only each question and its evidence to the engine factory.
+- `benchmark/run.py` runs the configured engine factory, writes per-case JSON and computed dashboard metrics, and records dataset hashes. The runner contains no hardcoded success scores.
+- Without an engine factory, the runner writes `not_run` with null metrics rather than substituting a scripted model or inventing results.
 - `InMemoryEvidenceIndex` provides deterministic indexed keyword retrieval for local use. Production can implement the `EvidenceIndex` protocol with a vector or hybrid index.
 - If no evidence is retrieved, an important claim is unsupported, verification needs review, or a document-level scan is ambiguous, the engine abstains with: `Insufficient evidence. The uploaded documents do not contain enough information to answer this question.`
 - Conflicting verified facts are returned together with both source citations; neither value is selected silently.
@@ -83,6 +90,9 @@ SOUL_AI/
 │   ├── response_engine/
 │   │   ├── __init__.py
 │   │   └── engine.py
+│   ├── evaluation/
+│   │   ├── __init__.py
+│   │   └── benchmark.py
 │   ├── api/
 │   │   ├── __init__.py
 │   │   └── contracts.py
@@ -103,7 +113,16 @@ SOUL_AI/
     ├── test_claim_extraction.py
     ├── test_claim_verification.py
     ├── test_contradictions.py
-    └── test_response_engine.py
+    ├── test_response_engine.py
+    └── test_benchmark.py
+benchmark/
+├── create_dataset.py
+├── run.py
+├── data/
+│   ├── inputs.json
+│   └── labels.json
+└── results/
+    └── latest.json
 ```
 
 ## PDF ingestion
@@ -267,6 +286,29 @@ payload = response.model_dump(mode="json")
 ```
 
 Tests exercise answerable, missing, conflicting, multi-source, unsupported, and misleading-assumption cases. They measure the pipeline behavior with controlled provider responses; they do not imply hallucinations are impossible or measure live model accuracy.
+
+## Phase 6 honesty benchmark
+
+The synthetic dataset has exactly 40 cases: 20 unsupported questions, five numerical contradictions, five date contradictions, five identity conflicts, and five consistent facts. Inputs and gold labels are stored separately. The benchmark uses text-backed `PdfEvidence` so it evaluates retrieval and response behavior without adding PDF parsing variability.
+
+Validate the dataset counts:
+
+```powershell
+python -m benchmark.run --validate-only
+```
+
+Run with a model-backed engine factory. The factory receives only the case's `list[PdfEvidence]` and returns a configured `ZeroGuessingEngine`; it does not receive gold labels or expected outcomes.
+
+```powershell
+$env:SOUL_BENCHMARK_ENGINE_FACTORY = "my_app.benchmark_factory:create_engine"
+python -m benchmark.run --output benchmark/results/latest.json
+```
+
+The factory must build its evidence index from the supplied evidence and configure the real answer and independent verifier providers. Each run records the input and label hashes, per-case predictions, errors, and dashboard metrics.
+
+Metrics are computed from observed outputs: rejection rate over the 20 unsupported cases; source-pair-level contradiction precision and recall; case-level false-positive contradiction rate; claim verification accuracy over target-related audit observations; citation accuracy over emitted citations; and gold citation coverage. Claim-verification accuracy excludes unrelated extracted facts because the dataset does not label them. Metric tests validate the calculations; they are not presented as model benchmark results.
+
+See [benchmark/results/latest.json](benchmark/results/latest.json) for the latest execution status.
 
 ### Sample extraction JSON
 

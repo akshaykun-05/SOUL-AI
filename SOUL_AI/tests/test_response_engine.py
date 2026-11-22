@@ -109,6 +109,8 @@ def test_supported_answer_has_checked_citation_for_every_claim():
     assert result.claims[0].evidence == [quote]
     assert "[loan.pdf, p. 3]" in result.answer
     assert "generated answer" not in result.answer
+    assert result.evaluation_trace
+    assert "evaluation_trace" not in result.model_dump(mode="json")
 
 
 def test_missing_answer_abstains_with_required_message():

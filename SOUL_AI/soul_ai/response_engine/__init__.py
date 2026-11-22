@@ -6,6 +6,7 @@ from .engine import (
     InMemoryEvidenceIndex,
     ResponseStatus,
     VerifiedAnswerClaim,
+    VerificationTraceEntry,
     ZeroGuessingEngine,
     ZeroGuessingResponse,
 )
@@ -15,6 +16,7 @@ __all__ = [
     "InMemoryEvidenceIndex",
     "ResponseStatus",
     "VerifiedAnswerClaim",
+    "VerificationTraceEntry",
     "ZeroGuessingEngine",
     "ZeroGuessingResponse",
 ]

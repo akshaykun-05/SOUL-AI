@@ -94,12 +94,15 @@ _ATTRIBUTE_ALIASES = {
     "payment deadline": "deadline_date",
     "borrower name": "borrower_name",
     "lender name": "lender_name",
+    "director name": "director_name",
+    "guarantor name": "guarantor_name",
+    "authorized signatory": "authorized_signatory",
     "name": "name",
     "identity": "identity",
     "condition": "condition",
     "contractual condition": "condition",
 }
-_MONEY_ATTRIBUTES = {"loan_amount", "principal_amount", "amount", "fee", "rent", "salary"}
+_MONEY_ATTRIBUTES = {"loan_amount", "principal_amount", "amount", "fee", "rent", "salary", "credit_limit"}
 _DATE_ATTRIBUTES = {"effective_date", "start_date", "deadline_date", "date", "due_date"}
 _CONDITION_ATTRIBUTES = {"condition", "contractual_condition", "termination_condition"}
 _CURRENCY_PATTERNS = {
@@ -318,7 +321,7 @@ class ContradictionDetector:
             return "equal", cls._type_for_attribute(attribute)
         if attribute in _CONDITION_ATTRIBUTES:
             return "ambiguous", ContradictionType.condition_conflict
-        if attribute in {"name", "identity", "borrower_name", "lender_name"}:
+        if attribute in {"name", "identity", "borrower_name", "lender_name", "director_name", "guarantor_name", "authorized_signatory"} or attribute.endswith("_name"):
             return "different", ContradictionType.identity_conflict
         return "ambiguous", cls._type_for_attribute(attribute)
 
@@ -332,7 +335,7 @@ class ContradictionDetector:
             return ContradictionType.date_conflict
         if attribute in _CONDITION_ATTRIBUTES:
             return ContradictionType.condition_conflict
-        if attribute in {"name", "identity", "borrower_name", "lender_name"}:
+        if attribute in {"name", "identity", "borrower_name", "lender_name", "director_name", "guarantor_name", "authorized_signatory"} or attribute.endswith("_name"):
             return ContradictionType.identity_conflict
         return ContradictionType.value_conflict
 

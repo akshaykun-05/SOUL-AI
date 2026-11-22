@@ -1,0 +1,948 @@
+{
+  "dataset_version": "1.0.0",
+  "cases": [
+    {
+      "case_id": "T012",
+      "question": "When is the Redwood lease due?",
+      "evidence": [
+        {
+          "evidence_id": "T012-E1",
+          "document_id": "T012-D1",
+          "filename": "t012_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Redwood lease deadline is 30 June 2027.",
+          "start_offset": 0,
+          "end_offset": 39,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T012-E2",
+          "document_id": "T012-D2",
+          "filename": "t012_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Redwood lease deadline is June 30, 2027.",
+          "start_offset": 0,
+          "end_offset": 40,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T003",
+      "question": "When does the Indigo policy expire?",
+      "evidence": [
+        {
+          "evidence_id": "T003-E1",
+          "document_id": "T003-D1",
+          "filename": "t003_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Indigo policy expires on 31 December 2026.",
+          "start_offset": 0,
+          "end_offset": 42,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T003-E2",
+          "document_id": "T003-D2",
+          "filename": "t003_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Indigo policy expires on 31 December 2027.",
+          "start_offset": 0,
+          "end_offset": 42,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T035",
+      "question": "What is Mira Shah's date of birth?",
+      "evidence": [
+        {
+          "evidence_id": "T035-E1",
+          "document_id": "T035-D1",
+          "filename": "t035_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "The borrower is Mira Shah and the loan principal is INR 400,000; no birth date is recorded.",
+          "start_offset": 0,
+          "end_offset": 91,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T004",
+      "question": "What is the deadline for the Harbor submission?",
+      "evidence": [
+        {
+          "evidence_id": "T004-E1",
+          "document_id": "T004-D1",
+          "filename": "t004_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Harbor submission deadline is 2026-03-01.",
+          "start_offset": 0,
+          "end_offset": 41,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T004-E2",
+          "document_id": "T004-D2",
+          "filename": "t004_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Harbor submission deadline is 2026-03-10.",
+          "start_offset": 0,
+          "end_offset": 41,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T010",
+      "question": "What is the contact phone number for Meadow Supplies?",
+      "evidence": [
+        {
+          "evidence_id": "T010-E1",
+          "document_id": "T010-D1",
+          "filename": "t010_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Meadow Supplies contact page lists support@meadows.example but no phone number.",
+          "start_offset": 0,
+          "end_offset": 79,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T009",
+      "question": "What is the credit limit for Echo Trading?",
+      "evidence": [
+        {
+          "evidence_id": "T009-E1",
+          "document_id": "T009-D1",
+          "filename": "t009_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Echo Trading credit limit is USD 100,000.",
+          "start_offset": 0,
+          "end_offset": 41,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T009-E2",
+          "document_id": "T009-D2",
+          "filename": "t009_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Echo Trading credit limit is USD 120,000.",
+          "start_offset": 0,
+          "end_offset": 41,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {
+        "C025-D1": "v1",
+        "C025-D2": "v2"
+      }
+    },
+    {
+      "case_id": "T007",
+      "question": "What is the vendor's bank account number?",
+      "evidence": [
+        {
+          "evidence_id": "T007-E1",
+          "document_id": "T007-D1",
+          "filename": "t007_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Vendor profile lists the bank name and IFSC code but does not include an account number.",
+          "start_offset": 0,
+          "end_offset": 88,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T038",
+      "question": "What percentage of the Aurora project is complete?",
+      "evidence": [
+        {
+          "evidence_id": "T038-E1",
+          "document_id": "T038-D1",
+          "filename": "t038_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Aurora project plan gives a final deadline of 30 September 2026; no completion percentage is stated.",
+          "start_offset": 0,
+          "end_offset": 100,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T002",
+      "question": "What is Acme Ltd's sanctioned loan amount?",
+      "evidence": [
+        {
+          "evidence_id": "T002-E1",
+          "document_id": "T002-D1",
+          "filename": "t002_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Acme Ltd sanctioned loan amount is Rs. 6,00,000.",
+          "start_offset": 0,
+          "end_offset": 48,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T002-E2",
+          "document_id": "T002-D2",
+          "filename": "t002_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Acme Ltd sanctioned loan amount is Rs. 5,00,000.",
+          "start_offset": 0,
+          "end_offset": 48,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T015",
+      "question": "Which court has jurisdiction over the Northstar contract?",
+      "evidence": [
+        {
+          "evidence_id": "T015-E1",
+          "document_id": "T015-D1",
+          "filename": "t015_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Northstar contract covers consulting services in India but does not specify a governing court.",
+          "start_offset": 0,
+          "end_offset": 94,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T028",
+      "question": "What interest rate applies to Cobalt's facility?",
+      "evidence": [
+        {
+          "evidence_id": "T028-E1",
+          "document_id": "T028-D1",
+          "filename": "t028_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Cobalt Ltd facility interest rate is 9.5 percent.",
+          "start_offset": 0,
+          "end_offset": 49,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T028-E2",
+          "document_id": "T028-D2",
+          "filename": "t028_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Cobalt Ltd facility interest rate is 10 percent.",
+          "start_offset": 0,
+          "end_offset": 48,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T036",
+      "question": "What is the annual subscription amount for Quartz Cloud?",
+      "evidence": [
+        {
+          "evidence_id": "T036-E1",
+          "document_id": "T036-D1",
+          "filename": "t036_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Quartz Cloud subscription amount is Rs. 6,00,000 annually.",
+          "start_offset": 0,
+          "end_offset": 58,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T036-E2",
+          "document_id": "T036-D2",
+          "filename": "t036_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Quartz Cloud subscription amount is Rs. 50,000 monthly.",
+          "start_offset": 0,
+          "end_offset": 55,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T011",
+      "question": "Who is the borrower in the Saffron agreement?",
+      "evidence": [
+        {
+          "evidence_id": "T011-E1",
+          "document_id": "T011-D1",
+          "filename": "t011_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Saffron agreement identifies Aarav Mehta as borrower.",
+          "start_offset": 0,
+          "end_offset": 53,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T011-E2",
+          "document_id": "T011-D2",
+          "filename": "t011_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Saffron schedule identifies Aarav Mehta as borrower.",
+          "start_offset": 0,
+          "end_offset": 52,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T029",
+      "question": "What interest rate applies to Orion's loan?",
+      "evidence": [
+        {
+          "evidence_id": "T029-E1",
+          "document_id": "T029-D1",
+          "filename": "t029_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Orion loan summary lists the lender and principal but omits the interest rate.",
+          "start_offset": 0,
+          "end_offset": 78,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T018",
+      "question": "What is the floor area of the Greenfield property?",
+      "evidence": [
+        {
+          "evidence_id": "T018-E1",
+          "document_id": "T018-D1",
+          "filename": "t018_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "The Greenfield property is at 18 Hill Street. The document gives no floor area.",
+          "start_offset": 0,
+          "end_offset": 79,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T021",
+      "question": "When must the Juniper filing be submitted?",
+      "evidence": [
+        {
+          "evidence_id": "T021-E1",
+          "document_id": "T021-D1",
+          "filename": "t021_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Juniper filing is due on 30 April 2025.",
+          "start_offset": 0,
+          "end_offset": 39,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T021-E2",
+          "document_id": "T021-D2",
+          "filename": "t021_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Juniper filing is due on 31 May 2025.",
+          "start_offset": 0,
+          "end_offset": 37,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T040",
+      "question": "Who is listed as director of Lumen Works?",
+      "evidence": [
+        {
+          "evidence_id": "T040-E1",
+          "document_id": "T040-D1",
+          "filename": "t040_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Lumen Works filing lists Daniel Ortiz as director.",
+          "start_offset": 0,
+          "end_offset": 50,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T040-E2",
+          "document_id": "T040-D2",
+          "filename": "t040_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Lumen Works filing lists Daniel Ortega as director.",
+          "start_offset": 0,
+          "end_offset": 51,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T031",
+      "question": "Can the Meridian contract be renewed?",
+      "evidence": [
+        {
+          "evidence_id": "T031-E1",
+          "document_id": "T031-D1",
+          "filename": "t031_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Meridian contract states an end date of 31 December 2027 but contains no renewal option.",
+          "start_offset": 0,
+          "end_offset": 88,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T013",
+      "question": "How often must the Vega loan be repaid?",
+      "evidence": [
+        {
+          "evidence_id": "T013-E1",
+          "document_id": "T013-D1",
+          "filename": "t013_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Vega loan schedule states an amount of INR 90,000 but does not state repayment frequency.",
+          "start_offset": 0,
+          "end_offset": 89,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T027",
+      "question": "What was Acme Ltd's annual revenue?",
+      "evidence": [
+        {
+          "evidence_id": "T027-E1",
+          "document_id": "T027-D1",
+          "filename": "t027_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Acme Ltd profile: registered office Pune; no revenue amount is stated.",
+          "start_offset": 0,
+          "end_offset": 70,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T023",
+      "question": "What was Juniper's net profit in FY2025?",
+      "evidence": [
+        {
+          "evidence_id": "T023-E1",
+          "document_id": "T023-D1",
+          "filename": "t023_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Juniper FY2025 report lists revenue and operating expenses; no net profit figure is provided.",
+          "start_offset": 0,
+          "end_offset": 93,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T033",
+      "question": "How long is the warranty for the Atlas device?",
+      "evidence": [
+        {
+          "evidence_id": "T033-E1",
+          "document_id": "T033-D1",
+          "filename": "t033_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Atlas device warranty terms list exclusions but do not state a warranty duration.",
+          "start_offset": 0,
+          "end_offset": 81,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T006",
+      "question": "Who is the authorized signatory for Opal Services?",
+      "evidence": [
+        {
+          "evidence_id": "T006-E1",
+          "document_id": "T006-D1",
+          "filename": "t006_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Opal Services register lists Kiran Das as authorized signatory.",
+          "start_offset": 0,
+          "end_offset": 63,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T006-E2",
+          "document_id": "T006-D2",
+          "filename": "t006_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Opal Services register lists Kiran Dutta as authorized signatory.",
+          "start_offset": 0,
+          "end_offset": 65,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T026",
+      "question": "Who is listed as guarantor for borrower Anika Rao?",
+      "evidence": [
+        {
+          "evidence_id": "T026-E1",
+          "document_id": "T026-D1",
+          "filename": "t026_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Anika Rao is named as borrower and Lake Bank as lender; no guarantor is listed.",
+          "start_offset": 0,
+          "end_offset": 79,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T005",
+      "question": "What GST rate applies to the Solara service?",
+      "evidence": [
+        {
+          "evidence_id": "T005-E1",
+          "document_id": "T005-D1",
+          "filename": "t005_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Solara service invoice lists GST registration ID 29ABCDE1234F1Z5 but no tax rate.",
+          "start_offset": 0,
+          "end_offset": 81,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T022",
+      "question": "What is the annual lease amount for Birch House?",
+      "evidence": [
+        {
+          "evidence_id": "T022-E1",
+          "document_id": "T022-D1",
+          "filename": "t022_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Birch House annual lease amount is Rs. 6,00,000.",
+          "start_offset": 0,
+          "end_offset": 48,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T022-E2",
+          "document_id": "T022-D2",
+          "filename": "t022_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Birch House annual lease amount is Rs. 5,40,000.",
+          "start_offset": 0,
+          "end_offset": 48,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T008",
+      "question": "How many employees does Pinecone Labs have?",
+      "evidence": [
+        {
+          "evidence_id": "T008-E1",
+          "document_id": "T008-D1",
+          "filename": "t008_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Pinecone Labs is a software company headquartered in Kochi; its employee count is not given.",
+          "start_offset": 0,
+          "end_offset": 92,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T016",
+      "question": "Who is Nova Systems' current CEO?",
+      "evidence": [
+        {
+          "evidence_id": "T016-E1",
+          "document_id": "T016-D1",
+          "filename": "t016_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Nova Systems governance report describes a CEO transition committee but gives no current CEO name.",
+          "start_offset": 0,
+          "end_offset": 98,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T017",
+      "question": "When does the Helios policy begin?",
+      "evidence": [
+        {
+          "evidence_id": "T017-E1",
+          "document_id": "T017-D1",
+          "filename": "t017_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Helios policy document gives policy number HP-204 but contains no commencement date.",
+          "start_offset": 0,
+          "end_offset": 84,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T001",
+      "question": "Who is the borrower in the Kestrel agreement?",
+      "evidence": [
+        {
+          "evidence_id": "T001-E1",
+          "document_id": "T001-D1",
+          "filename": "t001_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Kestrel agreement names Asha Menon as borrower.",
+          "start_offset": 0,
+          "end_offset": 47,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T001-E2",
+          "document_id": "T001-D2",
+          "filename": "t001_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Kestrel agreement names Riya Menon as borrower.",
+          "start_offset": 0,
+          "end_offset": 47,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T020",
+      "question": "What is the confirmed delivery date for order 8842?",
+      "evidence": [
+        {
+          "evidence_id": "T020-E1",
+          "document_id": "T020-D1",
+          "filename": "t020_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Order 8842 is for two printers and has shipping address 12 Lake Road; no delivery date is stated.",
+          "start_offset": 0,
+          "end_offset": 97,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T019",
+      "question": "What late payment penalty applies to the Cedar agreement?",
+      "evidence": [
+        {
+          "evidence_id": "T019-E1",
+          "document_id": "T019-D1",
+          "filename": "t019_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "Cedar agreement says late payments are subject to a penalty but gives no penalty amount.",
+          "start_offset": 0,
+          "end_offset": 88,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T034",
+      "question": "What is the legal name of borrower Maple Retail?",
+      "evidence": [
+        {
+          "evidence_id": "T034-E1",
+          "document_id": "T034-D1",
+          "filename": "t034_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Loan schedule names Maple Retail Private Limited as borrower.",
+          "start_offset": 0,
+          "end_offset": 61,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T034-E2",
+          "document_id": "T034-D2",
+          "filename": "t034_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Loan schedule names Maple Retail LLP as borrower.",
+          "start_offset": 0,
+          "end_offset": 49,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T039",
+      "question": "How many days of notice are required to terminate the lease?",
+      "evidence": [
+        {
+          "evidence_id": "T039-E1",
+          "document_id": "T039-D1",
+          "filename": "t039_reference.pdf",
+          "page_number": 1,
+          "extracted_text": "The lease identifies the property and monthly rent. It does not state a termination notice period.",
+          "start_offset": 0,
+          "end_offset": 98,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T032",
+      "question": "What interest rate applies to the Topaz loan?",
+      "evidence": [
+        {
+          "evidence_id": "T032-E1",
+          "document_id": "T032-D1",
+          "filename": "t032_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Topaz loan interest rate is 8.5 percent.",
+          "start_offset": 0,
+          "end_offset": 40,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T032-E2",
+          "document_id": "T032-D2",
+          "filename": "t032_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "The interest rate for Topaz loan is 8.5 percent.",
+          "start_offset": 0,
+          "end_offset": 48,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T037",
+      "question": "What is the principal amount for Umber Finance?",
+      "evidence": [
+        {
+          "evidence_id": "T037-E1",
+          "document_id": "T037-D1",
+          "filename": "t037_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Umber Finance principal amount is INR 5 lakh.",
+          "start_offset": 0,
+          "end_offset": 45,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T037-E2",
+          "document_id": "T037-D2",
+          "filename": "t037_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Umber Finance loan amount is Rs. 500,000.",
+          "start_offset": 0,
+          "end_offset": 41,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T024",
+      "question": "What is the late fee in the Delta contract?",
+      "evidence": [
+        {
+          "evidence_id": "T024-E1",
+          "document_id": "T024-D1",
+          "filename": "t024_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Delta contract late fee is INR 25,000.",
+          "start_offset": 0,
+          "end_offset": 38,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T024-E2",
+          "document_id": "T024-D2",
+          "filename": "t024_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Delta contract late fee is INR 30,000.",
+          "start_offset": 0,
+          "end_offset": 38,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T025",
+      "question": "Who is the guarantor for Nacre Industries?",
+      "evidence": [
+        {
+          "evidence_id": "T025-E1",
+          "document_id": "T025-D1",
+          "filename": "t025_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Nacre Industries agreement names Priya Shah as guarantor.",
+          "start_offset": 0,
+          "end_offset": 57,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T025-E2",
+          "document_id": "T025-D2",
+          "filename": "t025_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Nacre Industries agreement names Prisha Shah as guarantor.",
+          "start_offset": 0,
+          "end_offset": 58,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T030",
+      "question": "When is the Falcon loan due?",
+      "evidence": [
+        {
+          "evidence_id": "T030-E1",
+          "document_id": "T030-D1",
+          "filename": "t030_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Falcon loan repayment deadline is 30 June 2027.",
+          "start_offset": 0,
+          "end_offset": 47,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T030-E2",
+          "document_id": "T030-D2",
+          "filename": "t030_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Falcon loan repayment deadline is 15 July 2027.",
+          "start_offset": 0,
+          "end_offset": 47,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    },
+    {
+      "case_id": "T014",
+      "question": "When does the Grove agreement take effect?",
+      "evidence": [
+        {
+          "evidence_id": "T014-E1",
+          "document_id": "T014-D1",
+          "filename": "t014_source_a.pdf",
+          "page_number": 1,
+          "extracted_text": "Grove agreement effective date is 1 January 2025.",
+          "start_offset": 0,
+          "end_offset": 49,
+          "extraction_method": "text",
+          "confidence": null
+        },
+        {
+          "evidence_id": "T014-E2",
+          "document_id": "T014-D2",
+          "filename": "t014_source_b.pdf",
+          "page_number": 2,
+          "extracted_text": "Grove agreement effective date is 15 January 2025.",
+          "start_offset": 0,
+          "end_offset": 50,
+          "extraction_method": "text",
+          "confidence": null
+        }
+      ],
+      "document_versions": {}
+    }
+  ]
+}
