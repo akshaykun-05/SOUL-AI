@@ -58,3 +58,32 @@ class AIResultCache(Base):
     )
     cache_key: Mapped[str] = mapped_column(String(64))
     payload: Mapped[str] = mapped_column(Text)
+
+
+class ContradictionAnalysis(Base):
+    __tablename__ = "contradiction_analyses"
+
+    analysis_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    payload: Mapped[str] = mapped_column(Text)
+
+
+class ContradictionSource(Base):
+    __tablename__ = "contradiction_sources"
+
+    analysis_id: Mapped[UUID] = mapped_column(
+        ForeignKey("contradiction_analyses.analysis_id", ondelete="CASCADE"), primary_key=True
+    )
+    document_id: Mapped[UUID] = mapped_column(
+        ForeignKey("documents.document_id", ondelete="CASCADE"), primary_key=True, index=True
+    )
+    fingerprint: Mapped[str] = mapped_column(String(64))
+
+
+class VerifiedInputCache(Base):
+    __tablename__ = "verified_comparison_inputs"
+
+    document_id: Mapped[UUID] = mapped_column(
+        ForeignKey("documents.document_id", ondelete="CASCADE"), primary_key=True
+    )
+    cache_key: Mapped[str] = mapped_column(String(64))
+    payload: Mapped[str] = mapped_column(Text)

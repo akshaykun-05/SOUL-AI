@@ -29,6 +29,9 @@ class Engine:
     request_error: type[Exception]
     model_identity: tuple[str, str, str | None]
     verification_provider: "VerificationProvider | None" = None
+    detector: object | None = None
+    claim_type: type | None = None
+    verification_type: type | None = None
 
 
 class VerificationProvider:
@@ -66,7 +69,8 @@ def inspect_engine() -> tuple[AIStatus, Engine | None]:
             ProviderConfigurationError,
             ProviderRequestError,
         )
-        from soul_ai.verification import ClaimVerifier
+        from soul_ai.schemas import AtomicClaim
+        from soul_ai.verification import ClaimVerificationResult, ClaimVerifier
         interfaces = (
             PdfEvidence, ClaimExtractor.extract, ClaimVerifier.verify_many,
             ContradictionDetector.detect, create_configured_provider,
@@ -117,6 +121,9 @@ def inspect_engine() -> tuple[AIStatus, Engine | None]:
         PdfEvidence, extractor, verifier, ProviderRequestError,
         (settings.provider, settings.model, settings.base_url),
         verification_provider,
+        ContradictionDetector(),
+        AtomicClaim,
+        ClaimVerificationResult,
     )
 
 
@@ -138,8 +145,8 @@ def unavailable(
     ), None
 
 
-async def process_document(document: DocumentResponse, engine: Engine) -> AIProcessingResult:
-    evidence = [
+def page_evidence(document: DocumentResponse, engine: Engine) -> list:
+    return [
         engine.evidence_type(
             evidence_id=str(uuid5(document.document_id, f"page:{page.page_number}")),
             document_id=str(document.document_id),
@@ -152,8 +159,10 @@ async def process_document(document: DocumentResponse, engine: Engine) -> AIProc
         )
         for page in document.pages if page.text.strip()
     ]
+
+
+async def extract_and_verify(evidence: list, engine: Engine) -> tuple[dict, list]:
     evidence_ids = {item.evidence_id for item in evidence}
-    pages = {item.page_number: item.extracted_text for item in evidence}
 
     try:
         extraction = await engine.extractor.extract(PROMPT, evidence)
@@ -178,6 +187,13 @@ async def process_document(document: DocumentResponse, engine: Engine) -> AIProc
     if len(reports) != len(candidates) or {report.claim_id for report in reports} != candidates.keys():
         raise ValueError("Verification results do not match candidate IDs")
 
+    return candidates, reports
+
+
+async def process_document(document: DocumentResponse, engine: Engine) -> AIProcessingResult:
+    evidence = page_evidence(document, engine)
+    candidates, reports = await extract_and_verify(evidence, engine)
+    pages = {item.page_number: item.extracted_text for item in evidence}
     claims = []
     references = {}
     warnings = []

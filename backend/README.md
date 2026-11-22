@@ -100,8 +100,74 @@ $upload = curl.exe -fsS -F "file=@C:/path/to/document.pdf" http://127.0.0.1:8000
 Invoke-RestMethod -Method Post "http://127.0.0.1:8000/api/ai/process/$($upload.document_id)"
 ```
 
-Processing returns `completed` for supported findings, `insufficient_evidence` when no independently supported claims were produced, or `ocr_required` for documents without readable text. Every returned citation contains the original document UUID, filename, 1-based page number and verbatim excerpt. Unknown documents return HTTP 404, malformed UUIDs return 422, unavailable engine or provider returns 503, and unexpected failures return a generic 500. OCR, cross-document comparisons and Q&A have no processing routes in this phase. The fixed prompt is aimed at identifying explicit facts and provides no guarantee of exhaustive extraction. Large documents are limited by the configured model's context window.
+Processing returns `completed` for supported findings, `insufficient_evidence` when no independently supported claims were produced, or `ocr_required` for documents without readable text. Every returned citation contains the original document UUID, filename, 1-based page number and verbatim excerpt. Unknown documents return HTTP 404, malformed UUIDs return 422, unavailable engine or provider returns 503, and unexpected failures return a generic 500. The single-document route does not perform OCR, cross-document comparison, or Q&A. The fixed prompt is aimed at identifying explicit facts and provides no guarantee of exhaustive extraction. Large documents are limited by the configured model's context window.
 
 ### Optional SQLite result cache
 
 Set `SOUL_BACKEND_AI_CACHE_REVISION` to a nonempty deployment revision to reuse fully verified results. Change the revision when deploying a new engine build, changing provider credentials or routing, or updating a model behind the same name. Cache keys also include the stored pages and metadata, adapter schema version, prompt, and configured provider/model/URL. OCR, abstentions, partial verification and errors are excluded. Deleting a document deletes its cached result. Concurrent requests can both invoke the provider before a result is saved.
+
+## Cross-document contradictions
+
+Configure the engine and provider as described above. In Swagger at
+`http://127.0.0.1:8000/docs`, upload two to five PDFs through
+`POST /api/documents/upload-multiple`. Copy their document UUIDs into
+`POST /api/ai/contradictions`. Use the returned `analysis_id` with the two
+GET endpoints to retrieve the analysis and its evidence.
+
+```json
+{
+  "document_ids": [
+    "00000000-0000-4000-8000-000000000001",
+    "00000000-0000-4000-8000-000000000002"
+  ]
+}
+```
+
+| Endpoint | Result |
+| --- | --- |
+| `POST /api/ai/contradictions` | Compares 2–5 unique document UUIDs. Returns the analysis UUID, requested IDs, timestamps, status, analyzed-document count, skipped OCR document IDs, findings, and warnings. |
+| `GET /api/ai/contradictions/{analysis_id}` | Returns the saved analysis with its verified findings. |
+| `GET /api/ai/contradictions/{analysis_id}/evidence` | Returns each finding ID alongside its two page citations. |
+
+A `completed` analysis can have an empty findings list. Documents without
+readable text are skipped and listed in `ocr_required_document_ids`. If fewer
+than two readable documents remain, the endpoint saves an
+`insufficient_readable_documents` result without calling the provider. Blank
+pages are skipped while the original PDF page numbers are preserved.
+
+The backend extracts and independently verifies claims separately for each
+document, then calls the teammate's
+`ContradictionDetector.detect(claims, verifications, original_evidence)`.
+Each verified finding has two claim sides, an engine classification and
+explanation, and exact stored quotations with document UUID, filename,
+1-based page number, and evidence ID. Quotations must be verbatim substrings
+of the stored page text. Findings missing either independent citation, or
+flagged for human review, are excluded with a warning. Engine-labeled temporal
+or version changes are excluded. The request carries no document version
+labels, so the engine cannot infer undeclared versions. Identical filenames
+with identical passages on the same page can cause the detector to abstain
+because its verification quotes lack document IDs. The engine provides no
+calibrated confidence or severity, so `confidence` is always `null`.
+
+SQLite stores each analysis and its findings as a single snapshot, tied to
+the submitted documents and their content fingerprints. Startup adds the
+tables to existing databases. Deleting a source through the document API
+removes its analyses and cached inputs in the same transaction. Changes to
+stored text make earlier results unavailable, and changes during inference
+prevent the new snapshot from being saved. When `SOUL_BACKEND_AI_CACHE_REVISION`
+is set, comparisons reuse fully verified structured claim inputs by document
+content, provider/model identity, and revision. This cache is separate from
+the single-document response cache because the detector needs the original
+claim fields and verification reports. Analyses themselves are saved as new
+snapshots on each request.
+
+The asynchronous processing budget is 120 seconds for extraction,
+verification, and detection. The provider's own HTTP timeout still applies.
+On timeout the request returns without saving an analysis. An in-flight
+provider HTTP call may finish in its worker thread. Invalid IDs, duplicates,
+and out-of-range document counts return HTTP 422. Missing documents and
+unknown or stale analyses return 404. Source changes detected before saving
+return 409. Missing provider configuration or a provider request failure
+returns 503, a timeout returns 504, and unexpected errors return a generic
+500. Backend tests use real engine components with controlled provider
+responses and temporary SQLite databases.

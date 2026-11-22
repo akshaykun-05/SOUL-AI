@@ -3,10 +3,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
 
-from .document_models import Document, DocumentPage, utc_now
+from .document_models import (
+    ContradictionAnalysis, ContradictionSource, Document, DocumentPage, utc_now,
+)
 from .document_schemas import DocumentList, DocumentPage as PageResponse
 from .document_schemas import DocumentResponse, DocumentSummary, ExtractionStatus
 from .document_storage import DocumentStorage
@@ -61,6 +63,21 @@ def get_document(session: Session, document_id: UUID) -> DocumentResponse:
     record = session.get(Document, document_id, options=[selectinload(Document.pages)])
     if record is None:
         raise FileNotFoundError
+    return document_response(record)
+
+
+def get_documents(session: Session, document_ids: list[UUID]) -> list[DocumentResponse]:
+    statement = (
+        select(Document).where(Document.document_id.in_(document_ids))
+        .options(selectinload(Document.pages))
+    )
+    records = {record.document_id: record for record in session.scalars(statement)}
+    if len(records) != len(document_ids):
+        raise FileNotFoundError
+    return [document_response(records[document_id]) for document_id in document_ids]
+
+
+def document_response(record: Document) -> DocumentResponse:
     return DocumentResponse(
         document_id=record.document_id,
         filename=record.original_filename,
@@ -121,6 +138,12 @@ def delete_document(session: Session, storage: DocumentStorage, document_id: UUI
             if record is None:
                 raise FileNotFoundError
             pending = storage.quarantine(document_id)
+            analysis_ids = select(ContradictionSource.analysis_id).where(
+                ContradictionSource.document_id == document_id
+            )
+            session.execute(delete(ContradictionAnalysis).where(
+                ContradictionAnalysis.analysis_id.in_(analysis_ids)
+            ))
             session.delete(record)
     except BaseException:
         if pending is not None:

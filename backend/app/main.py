@@ -10,6 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .ai_routes import create_ai_router
 from .config import Settings
+from .contradiction_routes import create_contradiction_router
 from .database import Database
 from .documents import create_documents_router
 
@@ -59,6 +60,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(create_documents_router(settings, database))
     app.include_router(create_ai_router(database, settings.ai_cache_revision))
+    app.include_router(create_contradiction_router(database, settings.ai_cache_revision))
     return app
 
 
