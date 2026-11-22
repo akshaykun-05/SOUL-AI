@@ -1,6 +1,6 @@
-# SOUL AI - Phase 4
+# SOUL AI - Phase 5
 
-SOUL AI is an evidence-grounded document verification engine for Hack-A-Sol 5.0. It extracts page-aware PDF evidence, generates atomic claim candidates, independently verifies claims, and compares verified facts across documents for contradictions or possible changes.
+SOUL AI is an evidence-grounded document verification engine for Hack-A-Sol 5.0. It extracts page-aware PDF evidence, generates atomic claim candidates, independently verifies claims, detects cross-document conflicts, and abstains when it cannot support a factual answer.
 
 ## Architecture overview
 
@@ -26,6 +26,9 @@ Candidate claims -> separate verifier pass over all original evidence
 Cross-document comparison of verified facts
         |
         v
+Citation-grounded answer or explicit abstention
+        |
+        v
 Versioned JSON contract -> separate FastAPI backend / React frontend
 ```
 
@@ -39,6 +42,10 @@ Implemented phases:
 - `claim_extraction/extractor.py` sends only the question and supplied evidence to an injected `LLMProvider`, validates its JSON response, checks cited evidence IDs, and conservatively rejects candidate details not found in cited text.
 - `verification/verifier.py` runs one dedicated verifier call per claim over every original evidence chunk. Candidate source IDs are not passed to the verifier. It validates filename, page, and each quoted snippet against original extracted text before returning citations.
 - `contradictions/detector.py` compares only `SUPPORTED` claims with checked source quotes. It matches normalized entities and attributes, normalizes common currencies, scaled numbers, percentages, dates, and payment periods, and returns both source snippets.
+- `response_engine/engine.py` coordinates lexical retrieval, candidate claim extraction, independent verification, per-document conflict checks, citation assembly, and abstention. It returns only verified claim text, not free-form candidate answer prose.
+- `InMemoryEvidenceIndex` provides deterministic indexed keyword retrieval for local use. Production can implement the `EvidenceIndex` protocol with a vector or hybrid index.
+- If no evidence is retrieved, an important claim is unsupported, verification needs review, or a document-level scan is ambiguous, the engine abstains with: `Insufficient evidence. The uploaded documents do not contain enough information to answer this question.`
+- Conflicting verified facts are returned together with both source citations; neither value is selected silently.
 - Equivalent periodic amounts (for example, 600,000 annually and 50,000 monthly) are normalized. Cross-currency amounts are not converted without a date-appropriate exchange rate; those findings require human review.
 - Supply known document version labels to distinguish a possible revision from a same-version conflict. Findings across versions are labeled `version_change` and require human review. Different temporal contexts are labeled `temporal_change`.
 - Ambiguous date formats, incompatible units, and differing contractual conditions require human review rather than being presented as certain contradictions.
@@ -73,6 +80,9 @@ SOUL_AI/
 │   ├── contradictions/
 │   │   ├── __init__.py
 │   │   └── detector.py
+│   ├── response_engine/
+│   │   ├── __init__.py
+│   │   └── engine.py
 │   ├── api/
 │   │   ├── __init__.py
 │   │   └── contracts.py
@@ -92,7 +102,8 @@ SOUL_AI/
     ├── test_pdf_extraction.py
     ├── test_claim_extraction.py
     ├── test_claim_verification.py
-    └── test_contradictions.py
+    ├── test_contradictions.py
+    └── test_response_engine.py
 ```
 
 ## PDF ingestion
@@ -234,6 +245,28 @@ Sample finding:
   "requires_human_review": true
 }
 ```
+
+### Zero-guessing response pipeline
+
+Index original Phase 1 evidence, then inject the Phase 2 claim extractor and Phase 3 independent verifier. The engine answers with claim-level citations only after every candidate claim is supported. It emits the fixed insufficient-evidence message if it cannot verify the answer, and lists both sides of detected conflicts.
+
+```python
+from soul_ai.response_engine import InMemoryEvidenceIndex, ZeroGuessingEngine
+
+index = InMemoryEvidenceIndex(all_extracted_evidence)
+engine = ZeroGuessingEngine(
+    retriever=index,
+    claim_extractor=claim_extractor,
+    verifier=independent_verifier,
+)
+response = await engine.answer(
+    "What is the sanctioned loan amount?",
+    document_versions={"loan-v1": "v1", "loan-v2": "v2"},
+)
+payload = response.model_dump(mode="json")
+```
+
+Tests exercise answerable, missing, conflicting, multi-source, unsupported, and misleading-assumption cases. They measure the pipeline behavior with controlled provider responses; they do not imply hallucinations are impossible or measure live model accuracy.
 
 ### Sample extraction JSON
 
