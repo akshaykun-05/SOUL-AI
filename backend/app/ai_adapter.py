@@ -109,9 +109,18 @@ def inspect_engine() -> tuple[AIStatus, Engine | None]:
             "A model dependency could not be loaded.", package_ready=True, api_key_present=True,
         )
 
+    capabilities = list(CAPABILITIES)
+    try:
+        from soul_ai.response_engine import InMemoryEvidenceIndex, ZeroGuessingEngine
+    except (ImportError, OSError):
+        pass
+    else:
+        if callable(InMemoryEvidenceIndex.retrieve) and callable(ZeroGuessingEngine.answer):
+            capabilities.append("question_answering")
+
     return AIStatus(
         status="available",
-        capabilities=CAPABILITIES,
+        capabilities=capabilities,
         package_ready=True,
         dependencies_ready=True,
         provider_configured=True,

@@ -5,10 +5,10 @@ Use Python 3.10 or later. From the repository root in PowerShell:
 ```powershell
 Set-Location .\backend
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8765 --reload
 ```
 
-Open [Swagger UI](http://127.0.0.1:8000/docs) or check [service health](http://127.0.0.1:8000/api/health).
+Open [Swagger UI](http://127.0.0.1:8765/docs) or check [service health](http://127.0.0.1:8765/api/health).
 
 ## Configuration
 
@@ -95,9 +95,9 @@ The status endpoint checks the package, required imports and local provider conf
 Start Uvicorn from `backend/`, then run these commands in another PowerShell window:
 
 ```powershell
-Invoke-RestMethod http://127.0.0.1:8000/api/ai/status
-$upload = curl.exe -fsS -F "file=@C:/path/to/document.pdf" http://127.0.0.1:8000/api/documents/upload | ConvertFrom-Json
-Invoke-RestMethod -Method Post "http://127.0.0.1:8000/api/ai/process/$($upload.document_id)"
+Invoke-RestMethod http://127.0.0.1:8765/api/ai/status
+$upload = curl.exe -fsS -F "file=@C:/path/to/document.pdf" http://127.0.0.1:8765/api/documents/upload | ConvertFrom-Json
+Invoke-RestMethod -Method Post "http://127.0.0.1:8765/api/ai/process/$($upload.document_id)"
 ```
 
 Processing returns `completed` for supported findings, `insufficient_evidence` when no independently supported claims were produced, or `ocr_required` for documents without readable text. Every returned citation contains the original document UUID, filename, 1-based page number and verbatim excerpt. Unknown documents return HTTP 404, malformed UUIDs return 422, unavailable engine or provider returns 503, and unexpected failures return a generic 500. The single-document route does not perform OCR, cross-document comparison, or Q&A. The fixed prompt is aimed at identifying explicit facts and provides no guarantee of exhaustive extraction. Large documents are limited by the configured model's context window.
@@ -109,7 +109,7 @@ Set `SOUL_BACKEND_AI_CACHE_REVISION` to a nonempty deployment revision to reuse 
 ## Cross-document contradictions
 
 Configure the engine and provider as described above. In Swagger at
-`http://127.0.0.1:8000/docs`, upload two to five PDFs through
+`http://127.0.0.1:8765/docs`, upload two to five PDFs through
 `POST /api/documents/upload-multiple`. Copy their document UUIDs into
 `POST /api/ai/contradictions`. Use the returned `analysis_id` with the two
 GET endpoints to retrieve the analysis and its evidence.
@@ -171,3 +171,5 @@ return 409. Missing provider configuration or a provider request failure
 returns 503, a timeout returns 504, and unexpected errors return a generic
 500. Backend tests use real engine components with controlled provider
 responses and temporary SQLite databases.
+
+See the [integration handoff](INTEGRATION_HANDOFF.md) for grounded Q&A, the complete API contract, and the frontend workflow.

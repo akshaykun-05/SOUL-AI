@@ -13,6 +13,7 @@ from .config import Settings
 from .contradiction_routes import create_contradiction_router
 from .database import Database
 from .documents import create_documents_router
+from .qa_routes import create_qa_router
 
 
 logger = logging.getLogger(__name__)
@@ -61,6 +62,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(create_documents_router(settings, database))
     app.include_router(create_ai_router(database, settings.ai_cache_revision))
     app.include_router(create_contradiction_router(database, settings.ai_cache_revision))
+    app.include_router(create_qa_router(database))
     return app
 
 
