@@ -1,7 +1,10 @@
-fastapi>=0.115,<1
-pydantic>=2.7,<3
-pydantic-settings>=2.7,<3
-uvicorn>=0.34,<1
-httpx>=0.28,<1
-pytest>=8.4,<10
-PyMuPDF
+fastapi>=0.115,<1.0
+uvicorn>=0.30,<1.0
+PyMuPDF>=1.24,<2.0
+pydantic>=2.9,<3.0
+pydantic-settings>=2.6,<3.0
+python-dotenv>=1.0,<2.0
+pytest>=8.3,<10.0
+httpx>=0.27,<1.0
+# Optional OCR: also install a system Tesseract executable, then run
+# `pip install -e ".[ocr]"` from the SOUL_AI directory.
