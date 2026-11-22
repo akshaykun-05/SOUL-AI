@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
+from .ai_routes import create_ai_router
 from .config import Settings
 from .database import Database
 from .documents import create_documents_router
@@ -57,6 +58,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return HealthResponse(service=settings.service_name, version=settings.version)
 
     app.include_router(create_documents_router(settings, database))
+    app.include_router(create_ai_router(database, settings.ai_cache_revision))
     return app
 
 

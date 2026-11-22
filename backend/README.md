@@ -61,3 +61,47 @@ From `backend/`:
 ```
 
 The backend tests use temporary SQLite databases and upload directories.
+
+## AI processing
+
+From `backend/`, install the optional teammate engine in the same virtual environment:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ..\SOUL_AI
+```
+
+For a read-only checkout, use the source directory on the Python import path instead:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path ..\SOUL_AI).Path
+```
+
+The backend can start and manage documents without the engine. For model processing, set `SOUL_LLM_PROVIDER` (`openai` or `openai-compatible`), `SOUL_LLM_MODEL`, and `SOUL_LLM_API_KEY` in the process environment or backend `.env`. Set `SOUL_LLM_BASE_URL` for a compatible endpoint. The engine's HTTP provider uses the standard library and requires a nonblank key. Readiness checks import the engine and construct the provider locally. Processing sends stored readable text and filename/page references to the configured provider, so use a provider authorized to receive the document text.
+
+### Engine interfaces used
+
+| Engine interface | Backend behavior |
+| --- | --- |
+| `PdfEvidence` | Wraps stored SQLite text as one evidence span per readable page. Page numbers and text offsets are preserved, and blank pages are skipped. |
+| `ClaimExtractor.extract(question, evidence)` | Runs the async extraction pass with a fixed document-wide fact prompt. |
+| `ClaimVerifier.verify_many(claims, original_evidence)` | Runs a separate async verification pass with its own provider instance. Only supported claims with checked quotations appear in the API result. |
+| `ContradictionDetector.detect(...)` | Detected by readiness checks. It compares different source documents, so the single-document route reports cross-document contradictions as unavailable. |
+| `PdfIngestor`, `SOULAIEngineService`, `ZeroGuessingEngine` | The engine also provides PDF ingestion (with optional Tesseract OCR), an in-memory service, and a question-answer pipeline. This integration uses the existing SQLite repository and accepts stored text directly. |
+
+The status endpoint checks the package, required imports and local provider configuration without making a model request. The status response includes api_key_present, which is true for a nonblank key, false for a missing or blank key, and null when the settings cannot be checked. Process variables override backend/.env, including empty values. An available status means locally configured. Use your own provider key and keep it in the ignored backend/.env or the process environment. Processing checks provider reachability and credentials when it calls the provider. Backend tests mock engine calls and require no provider credentials or model downloads.
+
+### Try a real PDF
+
+Start Uvicorn from `backend/`, then run these commands in another PowerShell window:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/api/ai/status
+$upload = curl.exe -fsS -F "file=@C:/path/to/document.pdf" http://127.0.0.1:8000/api/documents/upload | ConvertFrom-Json
+Invoke-RestMethod -Method Post "http://127.0.0.1:8000/api/ai/process/$($upload.document_id)"
+```
+
+Processing returns `completed` for supported findings, `insufficient_evidence` when no independently supported claims were produced, or `ocr_required` for documents without readable text. Every returned citation contains the original document UUID, filename, 1-based page number and verbatim excerpt. Unknown documents return HTTP 404, malformed UUIDs return 422, unavailable engine or provider returns 503, and unexpected failures return a generic 500. OCR, cross-document comparisons and Q&A have no processing routes in this phase. The fixed prompt is aimed at identifying explicit facts and provides no guarantee of exhaustive extraction. Large documents are limited by the configured model's context window.
+
+### Optional SQLite result cache
+
+Set `SOUL_BACKEND_AI_CACHE_REVISION` to a nonempty deployment revision to reuse fully verified results. Change the revision when deploying a new engine build, changing provider credentials or routing, or updating a model behind the same name. Cache keys also include the stored pages and metadata, adapter schema version, prompt, and configured provider/model/URL. OCR, abstentions, partial verification and errors are excluded. Deleting a document deletes its cached result. Concurrent requests can both invoke the provider before a result is saved.

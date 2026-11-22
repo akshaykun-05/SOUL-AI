@@ -5,12 +5,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
+ENV_FILE = BACKEND_DIR / ".env"
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="SOUL_BACKEND_",
-        env_file=BACKEND_DIR / ".env",
+        env_file=ENV_FILE,
         env_file_encoding="utf-8",
         extra="ignore",
         populate_by_name=True,
@@ -49,3 +50,5 @@ class Settings(BaseSettings):
         default="sqlite:///data/soul_ai.sqlite3",
         validation_alias=AliasChoices("SOUL_BACKEND_DATABASE_URL", "DATABASE_URL"),
     )
+
+    ai_cache_revision: str = ""

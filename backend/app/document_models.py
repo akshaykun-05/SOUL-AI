@@ -48,3 +48,13 @@ class DocumentPage(Base):
     has_text: Mapped[bool]
 
     document: Mapped[Document] = relationship(back_populates="pages")
+
+
+class AIResultCache(Base):
+    __tablename__ = "ai_result_cache"
+
+    document_id: Mapped[UUID] = mapped_column(
+        ForeignKey("documents.document_id", ondelete="CASCADE"), primary_key=True
+    )
+    cache_key: Mapped[str] = mapped_column(String(64))
+    payload: Mapped[str] = mapped_column(Text)
