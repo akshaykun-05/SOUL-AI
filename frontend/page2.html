@@ -1,0 +1,389 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOUL AI â€” Authentication</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'midnight-navy': '#10121B',
+        'royal-violet': '#7047EB',
+        'warm-ivory': '#F3F2EF',
+        'evidence-teal': '#34B89A',
+        'muted-grey': '#9295A2',
+        'primary': '#7047EB',
+        'on-primary': '#FFFFFF',
+        'primary-hover': '#4D13C8',
+        'on-primary-hover': '#FFFFFF',
+        'primary-container': '#E7DEFF',
+        'on-primary-container': '#1F0060',
+        'secondary': '#34B89A',
+        'on-secondary': '#002019',
+        'secondary-text': '#006B57',
+        'secondary-container': '#B8FFE8',
+        'on-secondary-container': '#002019',
+        'surface': '#F3F2EF',
+        'surface-paper': '#FDFCF9',
+        'surface-container': '#E3E2DF',
+        'surface-container-low': '#F2F1EE',
+        'on-surface': '#10121B',
+        'on-surface-muted': '#5C5E69',
+        'outline': '#C7C6C4',
+        'outline-strong': '#91918E',
+        'surface-dark': '#10121B',
+        'surface-dark-elevated': '#191B24',
+        'surface-dark-container': '#2E303A',
+        'on-surface-dark': '#F3F2EF',
+        'on-surface-dark-muted': '#9295A2',
+        'outline-dark': '#2E303A',
+        'success': '#006B57',
+        'on-success': '#FFFFFF',
+        'success-container': '#B8FFE8',
+        'on-success-container': '#002019',
+        'error': '#BA1A1A',
+        'on-error': '#FFFFFF',
+        'error-container': '#FFDAD6',
+        'on-error-container': '#410002',
+        'warning': '#904D00',
+        'on-warning': '#FFFFFF',
+        'warning-container': '#FFDCC3',
+        'on-warning-container': '#2F1500',
+      },
+      borderRadius: {
+        'none': '0px',
+        'sm': '2px',
+        'DEFAULT': '4px',
+        'md': '6px',
+        'lg': '8px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '64px',
+        'section-lg': '96px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"IBM Plex Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['52px', { lineHeight: '58px', letterSpacing: '-1.2px', fontWeight: '700' }],
+        'display-lg-mobile': ['32px', { lineHeight: '38px', letterSpacing: '-0.6px', fontWeight: '700' }],
+        'headline-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.7px', fontWeight: '600' }],
+        'headline-lg-mobile': ['26px', { lineHeight: '32px', letterSpacing: '-0.4px', fontWeight: '600' }],
+        'headline-md': ['24px', { lineHeight: '32px', letterSpacing: '-0.3px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '-0.1px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'mono-md': ['13px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'mono-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '180ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      let mode = 'signin';
+      const tabSignin = document.getElementById('tab-signin');
+      const tabRegister = document.getElementById('tab-register');
+      const registerFields = document.getElementById('register-fields');
+      const submitLabel = document.getElementById('submit-label');
+      const authForm = document.getElementById('auth-form');
+      const emailInput = document.getElementById('email-input');
+      const passwordInput = document.getElementById('password-input');
+      const nameInput = document.getElementById('name-input');
+      const emailError = document.getElementById('email-error');
+      const passwordError = document.getElementById('password-error');
+      const statusBanner = document.getElementById('auth-status-banner');
+      const statusText = document.getElementById('auth-status-text');
+      const togglePwBtn = document.getElementById('toggle-password');
+      const demoAccessBtn = document.getElementById('demo-access-btn');
+      const stateButtons = document.querySelectorAll('[data-auth-state]');
+
+      function setMode(nextMode) {
+        mode = nextMode;
+        const isRegister = mode === 'register';
+        registerFields.classList.toggle('hidden', !isRegister);
+        submitLabel.textContent = isRegister ? 'Create Workspace Account' : 'Sign In to Workspace';
+
+        tabSignin.setAttribute('aria-selected', !isRegister ? 'true' : 'false');
+        tabRegister.setAttribute('aria-selected', isRegister ? 'true' : 'false');
+
+        tabSignin.classList.toggle('bg-surface-paper', !isRegister);
+        tabSignin.classList.toggle('text-on-surface', !isRegister);
+        tabSignin.classList.toggle('border-outline', !isRegister);
+        tabSignin.classList.toggle('text-on-surface-muted', isRegister);
+        tabSignin.classList.toggle('border-transparent', isRegister);
+
+        tabRegister.classList.toggle('bg-surface-paper', isRegister);
+        tabRegister.classList.toggle('text-on-surface', isRegister);
+        tabRegister.classList.toggle('border-outline', isRegister);
+        tabRegister.classList.toggle('text-on-surface-muted', !isRegister);
+        tabRegister.classList.toggle('border-transparent', !isRegister);
+        clearBanner();
+      }
+
+      function showBanner(type, message) {
+        statusBanner.classList.remove('hidden', 'bg-error-container', 'border-error', 'text-on-error-container', 'bg-secondary-container', 'border-secondary', 'text-on-secondary-container', 'bg-primary-container', 'border-primary', 'text-on-primary-container');
+        if (type === 'error') {
+          statusBanner.classList.add('bg-error-container', 'border-error', 'text-on-error-container');
+        } else if (type === 'success') {
+          statusBanner.classList.add('bg-secondary-container', 'border-secondary', 'text-on-secondary-container');
+        } else {
+          statusBanner.classList.add('bg-primary-container', 'border-primary', 'text-on-primary-container');
+        }
+        statusText.textContent = message;
+      }
+
+      function clearBanner() {
+        statusBanner.classList.add('hidden');
+      }
+
+      tabSignin.addEventListener('click', () => setMode('signin'));
+      tabRegister.addEventListener('click', () => setMode('register'));
+
+      togglePwBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        togglePwBtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        togglePwBtn.innerHTML = isPassword
+          ? '<i data-lucide="eye-off" class="w-4 h-4" aria-hidden="true"></i>'
+          : '<i data-lucide="eye" class="w-4 h-4" aria-hidden="true"></i>';
+        if (window.lucide) lucide.createIcons();
+      });
+
+      authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        clearBanner();
+        let valid = true;
+
+        const emailVal = emailInput.value.trim();
+        if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+          emailError.classList.remove('hidden');
+          valid = false;
+        } else {
+          emailError.classList.add('hidden');
+        }
+
+        if (!passwordInput.value || passwordInput.value.length < 8) {
+          passwordError.classList.remove('hidden');
+          valid = false;
+        } else {
+          passwordError.classList.add('hidden');
+        }
+
+        if (mode === 'register' && !nameInput.value.trim()) {
+          showBanner('error', 'Full name is required to register an analyst account.');
+          return;
+        }
+
+        if (!valid) {
+          showBanner('error', 'Review the highlighted fields before submitting.');
+          return;
+        }
+
+        showBanner('loading', 'Connecting to SOUL AI authentication adapter...');
+        setTimeout(() => {
+          showBanner('error', 'Backend authentication endpoint is not connected in this preview. Use Demo Access below to inspect the workspace.');
+        }, 500);
+      });
+
+      demoAccessBtn.addEventListener('click', () => {
+        showBanner('loading', 'Initializing read-only demonstration session...');
+        setTimeout(() => {
+          showBanner('success', 'Demo Access active (Analyst Preview Â· SES-DEMO-2026). All metrics shown in workspace are labelled demonstration data.');
+        }, 400);
+      });
+
+      stateButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const state = btn.getAttribute('data-auth-state');
+          if (state === 'loading') showBanner('loading', 'Verifying credentials with identity adapter...');
+          if (state === 'error') showBanner('error', 'Invalid credentials or unreachable authentication service (HTTP 401).');
+          if (state === 'success') showBanner('success', 'Session verified. Redirecting to SOUL AI Verification Workspace...');
+        });
+      });
+    });
+  </script>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased">
+  <div class="min-h-[1024px] grid grid-cols-1 lg:grid-cols-12" data-stitch-vh="min-h-[1024px]===min-h-screen">
+
+    <!-- Left Forensic Context Panel (Midnight Navy) -->
+    <aside class="lg:col-span-5 bg-surface-dark text-on-surface-dark p-8 md:p-12 flex flex-col justify-between gap-10 border-b lg:border-b-0 lg:border-r border-outline-dark">
+      <div class="flex flex-col gap-8">
+        <a href="page1.html" class="inline-flex items-center gap-3 self-start">
+          <div class="w-8 h-8 rounded-md bg-surface-dark-elevated flex items-center justify-center border border-outline-dark">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="#34B89A" stroke-width="2"></rect>
+              <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="#7047EB" stroke-width="2"></rect>
+              <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="#F3F2EF" stroke-width="2"></rect>
+              <path d="M14 17H20M17 14V20" stroke="#34B89A" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-title text-title-md text-on-surface-dark">SOUL AI</span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted">VERIFICATION WORKSPACE</span>
+          </div>
+        </a>
+
+        <div class="flex flex-col gap-4">
+          <span class="font-mono text-mono-sm text-secondary">EVIDENCE-GROUNDED ACCESS</span>
+          <h1 class="font-headline text-headline-lg-mobile md:text-headline-lg text-on-surface-dark text-balance" data-design-text-token="headline-lg">
+            Every claim traced. Every session audited.
+          </h1>
+          <p class="font-body text-body-md text-on-surface-dark-muted max-w-md text-pretty" data-design-text-token="body-md">
+            Sign in to upload multi-document bundles, inspect atomic claim verification, explore cross-document contradictions, and export auditable reports.
+          </p>
+        </div>
+
+        <div class="bg-surface-dark-elevated border border-outline-dark rounded-lg p-5 flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted">ADAPTER ARCHITECTURE</span>
+            <span class="font-mono text-mono-sm text-secondary">NO FAKE AUTH</span>
+          </div>
+          <p class="font-body text-body-md text-on-surface-dark-muted">
+            Authentication routes through a dedicated service adapter so backend identity providers can plug in without altering UI contracts.
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-outline-dark flex items-center justify-between font-mono text-mono-sm text-on-surface-dark-muted">
+        <span>TEAM SOUL SOCIETY</span>
+        <span>HACK-A-SOL 2026</span>
+      </div>
+    </aside>
+
+    <!-- Right Authentication Card Surface (Warm Ivory) -->
+    <main class="lg:col-span-7 bg-surface p-6 sm:p-10 md:p-16 flex flex-col justify-center items-center">
+      <div class="w-full max-w-md flex flex-col gap-6">
+
+        <!-- Mode Switcher -->
+        <div class="flex items-center gap-2 p-1 bg-surface-container-low border border-outline rounded-lg" role="tablist" aria-label="Authentication mode">
+          <button id="tab-signin" type="button" role="tab" aria-selected="true" class="flex-1 py-2 px-3 rounded-md bg-surface-paper border border-outline font-label text-label-lg text-on-surface transition-colors duration-state-change cursor-pointer">Sign In</button>
+          <button id="tab-register" type="button" role="tab" aria-selected="false" class="flex-1 py-2 px-3 rounded-md border border-transparent font-label text-label-lg text-on-surface-muted hover:text-on-surface transition-colors duration-state-change cursor-pointer">Create Account</button>
+        </div>
+
+        <!-- Status Banner (Loading / Error / Success) -->
+        <div id="auth-status-banner" role="status" aria-live="polite" class="hidden border rounded-md p-3.5 flex items-start gap-2.5">
+          <i data-lucide="info" class="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true"></i>
+          <p id="auth-status-text" class="font-body text-body-md"></p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-surface-paper border border-outline rounded-lg p-6 md:p-8 flex flex-col gap-6">
+          <div class="flex flex-col gap-1">
+            <h2 class="font-headline text-headline-md text-on-surface" data-design-text-token="headline-md">Workspace Access</h2>
+            <p class="font-body text-body-md text-on-surface-muted">Enter your analyst credentials or launch the demonstration workspace.</p>
+          </div>
+
+          <form id="auth-form" novalidate class="flex flex-col gap-4">
+            <div id="register-fields" class="hidden flex flex-col gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label for="name-input" class="font-label text-label-sm text-on-surface">Full Name</label>
+                <input id="name-input" type="text" autocomplete="name" placeholder="Dr. Ananya Rao" class="w-full rounded-md bg-surface border border-outline px-3.5 py-2.5 font-body text-body-md text-on-surface placeholder:text-on-surface-muted focus:border-primary focus:ring-1 focus:ring-primary">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label for="org-input" class="font-label text-label-sm text-on-surface">Organization / Audit Team</label>
+                <input id="org-input" type="text" placeholder="Forensic Compliance Group" class="w-full rounded-md bg-surface border border-outline px-3.5 py-2.5 font-body text-body-md text-on-surface placeholder:text-on-surface-muted focus:border-primary focus:ring-1 focus:ring-primary">
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="email-input" class="font-label text-label-sm text-on-surface">Work Email</label>
+              <input id="email-input" type="email" required autocomplete="email" placeholder="analyst@organization.org" class="w-full rounded-md bg-surface border border-outline px-3.5 py-2.5 font-body text-body-md text-on-surface placeholder:text-on-surface-muted focus:border-primary focus:ring-1 focus:ring-primary">
+              <span id="email-error" class="hidden font-label text-label-sm text-error">Enter a valid email address.</span>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <label for="password-input" class="font-label text-label-sm text-on-surface">Password</label>
+                <span class="font-mono text-mono-sm text-on-surface-muted">MIN 8 CHARS</span>
+              </div>
+              <div class="relative flex items-center">
+                <input id="password-input" type="password" required minlength="8" autocomplete="current-password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" class="w-full rounded-md bg-surface border border-outline pl-3.5 pr-10 py-2.5 font-body text-body-md text-on-surface placeholder:text-on-surface-muted focus:border-primary focus:ring-1 focus:ring-primary">
+                <button id="toggle-password" type="button" aria-label="Show password" class="absolute right-2.5 p-1 text-on-surface-muted hover:text-on-surface cursor-pointer">
+                  <i data-lucide="eye" class="w-4 h-4" aria-hidden="true"></i>
+                </button>
+              </div>
+              <span id="password-error" class="hidden font-label text-label-sm text-error">Password must be at least 8 characters.</span>
+            </div>
+
+            <button type="submit" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="mt-2 w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-primary text-on-primary hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors duration-state-change ease-state-change cursor-pointer">
+              <span id="submit-label" class="font-label text-label-lg" data-design-text-token="label-lg">Sign In to Workspace</span>
+              <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>
+            </button>
+          </form>
+
+          <div class="pt-4 border-t border-outline flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-mono-sm text-on-surface-muted">DEMONSTRATION ADAPTER</span>
+              <span class="font-mono text-mono-sm text-secondary-text">READ-ONLY SAMPLE</span>
+            </div>
+            <button id="demo-access-btn" type="button" data-component-id="button-secondary" data-component-type="button" data-component-variant="secondary" class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-surface-paper text-on-surface border border-outline hover:border-outline-strong hover:bg-surface-container-low transition-colors duration-state-change ease-state-change cursor-pointer">
+              <i data-lucide="terminal" class="w-4 h-4 text-primary" aria-hidden="true"></i>
+              <span class="font-label text-label-lg" data-design-text-token="label-lg">Continue with Demo Access</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Explicit Adapter State Inspector for Judges -->
+        <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+          <span class="font-mono text-mono-sm text-on-surface-muted">PREVIEW STATES:</span>
+          <div class="flex items-center gap-2">
+            <button type="button" data-auth-state="loading" class="px-2.5 py-1 rounded bg-surface-paper border border-outline font-mono text-mono-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Loading</button>
+            <button type="button" data-auth-state="error" class="px-2.5 py-1 rounded bg-surface-paper border border-outline font-mono text-mono-sm text-error hover:border-error cursor-pointer">Error</button>
+            <button type="button" data-auth-state="success" class="px-2.5 py-1 rounded bg-surface-paper border border-outline font-mono text-mono-sm text-success hover:border-success cursor-pointer">Success</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+
+<script>
+  document.getElementById('auth-form')?.addEventListener('submit', function (event) {
+    event.preventDefault();
+    window.location.href = 'page03.html';
+  });
+  document.getElementById('demo-access-btn')?.addEventListener('click', function () {
+    window.location.href = 'page03.html';
+  });
+</script>
+</body></html>

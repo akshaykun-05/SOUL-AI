@@ -1,0 +1,548 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOUL AI â€” Document Upload</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'midnight-navy': '#10121B',
+        'royal-violet': '#7047EB',
+        'warm-ivory': '#F3F2EF',
+        'evidence-teal': '#34B89A',
+        'muted-grey': '#9295A2',
+        'primary': '#7047EB',
+        'on-primary': '#FFFFFF',
+        'primary-hover': '#4D13C8',
+        'on-primary-hover': '#FFFFFF',
+        'primary-container': '#E7DEFF',
+        'on-primary-container': '#1F0060',
+        'secondary': '#34B89A',
+        'on-secondary': '#002019',
+        'secondary-text': '#006B57',
+        'secondary-container': '#B8FFE8',
+        'on-secondary-container': '#002019',
+        'surface': '#F3F2EF',
+        'surface-paper': '#FDFCF9',
+        'surface-container': '#E3E2DF',
+        'surface-container-low': '#F2F1EE',
+        'on-surface': '#10121B',
+        'on-surface-muted': '#5C5E69',
+        'outline': '#C7C6C4',
+        'outline-strong': '#91918E',
+        'surface-dark': '#10121B',
+        'surface-dark-elevated': '#191B24',
+        'surface-dark-container': '#2E303A',
+        'on-surface-dark': '#F3F2EF',
+        'on-surface-dark-muted': '#9295A2',
+        'outline-dark': '#2E303A',
+        'success': '#006B57',
+        'on-success': '#FFFFFF',
+        'success-container': '#B8FFE8',
+        'on-success-container': '#002019',
+        'error': '#BA1A1A',
+        'on-error': '#FFFFFF',
+        'error-container': '#FFDAD6',
+        'on-error-container': '#410002',
+        'warning': '#904D00',
+        'on-warning': '#FFFFFF',
+        'warning-container': '#FFDCC3',
+        'on-warning-container': '#2F1500',
+      },
+      borderRadius: {
+        'none': '0px',
+        'sm': '2px',
+        'DEFAULT': '4px',
+        'md': '6px',
+        'lg': '8px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '64px',
+        'section-lg': '96px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"IBM Plex Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['52px', { lineHeight: '58px', letterSpacing: '-1.2px', fontWeight: '700' }],
+        'display-lg-mobile': ['32px', { lineHeight: '38px', letterSpacing: '-0.6px', fontWeight: '700' }],
+        'headline-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.7px', fontWeight: '600' }],
+        'headline-lg-mobile': ['26px', { lineHeight: '32px', letterSpacing: '-0.4px', fontWeight: '600' }],
+        'headline-md': ['24px', { lineHeight: '32px', letterSpacing: '-0.3px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '-0.1px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'mono-md': ['13px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'mono-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '180ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      const mobileDrawer = document.getElementById('mobile-sidebar');
+      const closeDrawer = document.getElementById('close-sidebar');
+      if (sidebarToggle && mobileDrawer) sidebarToggle.addEventListener('click', () => mobileDrawer.classList.remove('hidden'));
+      if (closeDrawer && mobileDrawer) closeDrawer.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+
+      const dropZone = document.getElementById('upload-drop-zone');
+      const fileInput = document.getElementById('pdf-file-input');
+      const validationBanner = document.getElementById('upload-validation-error');
+      const validationText = document.getElementById('upload-validation-text');
+      const fileQueue = document.getElementById('file-queue-list');
+      const queueCount = document.getElementById('queue-count');
+      const startBtn = document.getElementById('start-analysis-btn');
+      const startFeedback = document.getElementById('start-analysis-feedback');
+
+      function updateQueueCount() {
+        const items = fileQueue.querySelectorAll('[data-file-item]');
+        queueCount.textContent = `${items.length} FILES IN SESSION`;
+        const validCount = fileQueue.querySelectorAll('[data-file-valid="true"]').length;
+        startBtn.disabled = validCount === 0;
+        startBtn.classList.toggle('opacity-40', validCount === 0);
+        startBtn.classList.toggle('cursor-not-allowed', validCount === 0);
+      }
+
+      function showValidationError(msg) {
+        validationText.textContent = msg;
+        validationBanner.classList.remove('hidden');
+      }
+
+      function clearValidationError() {
+        validationBanner.classList.add('hidden');
+      }
+
+      function addFiles(files) {
+        clearValidationError();
+        const errors = [];
+        Array.from(files).forEach((file) => {
+          const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+          const maxBytes = 25 * 1024 * 1024;
+          if (!isPdf) {
+            errors.push(`"${file.name}" rejected: only PDF files are supported.`);
+            return;
+          }
+          if (file.size > maxBytes) {
+            errors.push(`"${file.name}" exceeds the 25 MB per-file limit.`);
+            return;
+          }
+          const sizeMb = Math.max(0.1, file.size / (1024 * 1024)).toFixed(1);
+          const row = document.createElement('article');
+          row.setAttribute('data-file-item', '');
+          row.setAttribute('data-file-valid', 'true');
+          row.className = 'bg-surface border border-outline rounded-lg p-4 flex flex-col gap-3';
+          row.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-md bg-surface-paper border border-outline flex items-center justify-center shrink-0">
+                  <i data-lucide="file-text" class="w-4 h-4 text-primary" aria-hidden="true"></i>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="font-title text-title-md text-on-surface truncate">${file.name}</span>
+                  <span class="font-mono text-mono-sm text-on-surface-muted tabular-nums">${sizeMb} MB Â· PDF Â· QUEUED</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-secondary-container text-on-secondary-container border border-secondary font-label text-label-sm">Ready</span>
+                <button type="button" data-remove-file aria-label="Remove ${file.name}" class="p-1.5 rounded border border-outline bg-surface-paper text-on-surface-muted hover:text-error hover:border-error cursor-pointer">
+                  <i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-surface-container overflow-hidden">
+              <div class="h-full bg-secondary w-full"></div>
+            </div>
+          `;
+          fileQueue.prepend(row);
+        });
+        if (errors.length > 0) showValidationError(errors.join(' '));
+        if (window.lucide) lucide.createIcons();
+        updateQueueCount();
+      }
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-primary', 'bg-primary-container');
+      });
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-primary', 'bg-primary-container');
+      });
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-primary', 'bg-primary-container');
+        if (e.dataTransfer && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+      });
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) addFiles(e.target.files);
+      });
+
+      fileQueue.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('[data-remove-file]');
+        if (removeBtn) {
+          removeBtn.closest('[data-file-item]').remove();
+          updateQueueCount();
+          return;
+        }
+        const retryBtn = e.target.closest('[data-retry-file]');
+        if (retryBtn) {
+          const card = retryBtn.closest('[data-file-item]');
+          card.setAttribute('data-file-valid', 'true');
+          const status = card.querySelector('[data-file-status]');
+          const bar = card.querySelector('[data-progress-bar]');
+          if (status) {
+            status.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-secondary-container text-on-secondary-container border border-secondary font-label text-label-sm';
+            status.textContent = 'Ready';
+          }
+          if (bar) {
+            bar.className = 'h-full bg-secondary w-full';
+          }
+          retryBtn.remove();
+          updateQueueCount();
+        }
+      });
+
+      startBtn.addEventListener('click', () => {
+        startFeedback.classList.remove('hidden');
+      });
+
+      updateQueueCount();
+    });
+  </script>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased">
+  <div class="min-h-[1024px] flex flex-col lg:flex-row" data-stitch-vh="min-h-[1024px]===min-h-screen">
+
+    <!-- Persistent Desktop Sidebar (Midnight Navy) -->
+    <aside class="hidden lg:flex lg:w-64 lg:shrink-0 bg-surface-dark text-on-surface-dark border-r border-outline-dark flex-col justify-between min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen">
+      <div class="flex flex-col">
+        <div class="h-16 px-5 border-b border-outline-dark flex items-center gap-3">
+          <div class="w-8 h-8 rounded-md bg-surface-dark-elevated flex items-center justify-center border border-outline-dark shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="#34B89A" stroke-width="2"></rect>
+              <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="#7047EB" stroke-width="2"></rect>
+              <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="#F3F2EF" stroke-width="2"></rect>
+              <path d="M14 17H20M17 14V20" stroke="#34B89A" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="font-title text-title-md text-on-surface-dark">SOUL AI</span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted truncate">FORENSIC SUITE</span>
+          </div>
+        </div>
+
+        <nav aria-label="Workspace navigation" class="p-3 flex flex-col gap-1">
+          <span class="px-3 py-2 font-mono text-mono-sm text-on-surface-dark-muted">WORKSPACE</span>
+          <a href="page03.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Dashboard</span>
+          </a>
+          <a href="page04.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-md bg-surface-dark-elevated text-on-surface-dark border border-outline-dark">
+            <i data-lucide="upload-cloud" class="w-4 h-4 text-primary shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Document Upload</span>
+          </a>
+          <a href="page05.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="cpu" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Processing Centre</span>
+          </a>
+
+          <span class="px-3 pt-4 pb-2 font-mono text-mono-sm text-on-surface-dark-muted">ANALYSIS</span>
+          <a href="page06.html" class="flex items-center justify-between px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <span class="flex items-center gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+              <span class="font-label text-label-lg">Verification Results</span>
+            </span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted tabular-nums">142</span>
+          </a>
+          <a href="page07.html" class="flex items-center justify-between px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <span class="flex items-center gap-3">
+              <i data-lucide="git-compare" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+              <span class="font-label text-label-lg">Contradictions</span>
+            </span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted tabular-nums">7</span>
+          </a>
+          <a href="page08.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="file-search" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Evidence Viewer</span>
+          </a>
+
+          <span class="px-3 pt-4 pb-2 font-mono text-mono-sm text-on-surface-dark-muted">GOVERNANCE</span>
+          <a href="page09.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Honesty Benchmark</span>
+          </a>
+          <a href="page10.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="file-check" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Audit Report</span>
+          </a>
+          <a href="page11.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="settings" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-outline-dark flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-mono-sm text-secondary">DEMO DATA MODE</span>
+          <span class="w-2 h-2 rounded-full bg-secondary" aria-hidden="true"></span>
+        </div>
+        <p class="font-mono text-mono-sm text-on-surface-dark-muted">Team Soul Society Â· Hack-A-Sol</p>
+      </div>
+    </aside>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-sidebar" class="hidden fixed inset-0 z-40 bg-surface-dark text-on-surface-dark p-6 flex flex-col justify-between lg:hidden">
+      <div class="flex flex-col gap-6">
+        <div class="flex items-center justify-between border-b border-outline-dark pb-4">
+          <span class="font-title text-title-lg text-on-surface-dark">SOUL AI</span>
+          <button id="close-sidebar" type="button" aria-label="Close navigation" class="p-2 rounded-md border border-outline-dark text-on-surface-dark">
+            <i data-lucide="x" class="w-4 h-4" aria-hidden="true"></i>
+          </button>
+        </div>
+        <nav class="flex flex-col gap-2">
+          <a href="page03.html" class="px-3 py-2 rounded-md font-label text-label-lg text-on-surface-dark-muted">Dashboard</a>
+          <a href="page04.html" class="px-3 py-2 rounded-md bg-surface-dark-elevated font-label text-label-lg text-on-surface-dark">Document Upload</a>
+          <a href="page05.html" class="px-3 py-2 rounded-md font-label text-label-lg text-on-surface-dark-muted">Processing Centre</a>
+        </nav>
+      </div>
+      <span class="font-mono text-mono-sm text-on-surface-dark-muted">TEAM SOUL SOCIETY Â· DEMO MODE</span>
+    </div>
+
+    <!-- Main Workspace Area -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- Top Header (Shell Parity) -->
+      <header class="h-16 bg-surface-paper border-b border-outline px-gutter-md md:px-gutter-lg flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <button id="sidebar-toggle" type="button" aria-label="Open navigation" class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-outline bg-surface text-on-surface">
+            <i data-lucide="menu" class="w-4 h-4" aria-hidden="true"></i>
+          </button>
+          <h1 class="font-title text-title-lg text-on-surface truncate" data-design-text-token="title-lg">Document Upload</h1>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface border border-outline font-mono text-mono-sm text-on-surface-muted">
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary" aria-hidden="true"></span>
+            DEMONSTRATION DATA
+          </span>
+          <a href="page04.html" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-primary text-on-primary hover:bg-primary-hover transition-colors duration-state-change ease-state-change shrink-0">
+            <i data-lucide="upload" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg" data-design-text-token="label-lg">Upload PDF</span>
+          </a>
+          <div class="hidden md:flex items-center gap-2.5 pl-3 border-l border-outline">
+            <div class="w-8 h-8 rounded-md bg-surface-dark text-on-surface-dark flex items-center justify-center font-mono text-mono-sm">AR</div>
+            <div class="flex flex-col">
+              <span class="font-label text-label-sm text-on-surface">Ananya Rao</span>
+              <span class="font-mono text-mono-sm text-on-surface-muted">Lead Auditor</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main id="upload" class="flex-1 p-gutter-md md:p-gutter-lg max-w-7xl w-full mx-auto flex flex-col gap-6">
+
+        <!-- Session Grouping Bar -->
+        <section class="bg-surface-paper border border-outline rounded-lg p-5 grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div class="md:col-span-5 flex flex-col gap-1.5">
+            <label for="session-title" class="font-label text-label-sm text-on-surface">Analysis Session Name</label>
+            <input id="session-title" type="text" value="Q4 Vendor Compliance &amp; SLA Audit" class="w-full rounded-md bg-surface border border-outline px-3.5 py-2 font-body text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary">
+          </div>
+          <div class="md:col-span-4 flex flex-col gap-1.5">
+            <span class="font-label text-label-sm text-on-surface">Session Identifier</span>
+            <div class="px-3.5 py-2 rounded-md bg-surface-container-low border border-outline font-mono text-mono-md text-on-surface">SES-2026-085</div>
+          </div>
+          <div class="md:col-span-3 flex items-center justify-end">
+            <button id="start-analysis-btn" type="button" data-component-id="button-with-icon" data-component-type="button" data-component-variant="with-icon" class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-primary text-on-primary hover:bg-primary-hover transition-colors duration-state-change cursor-pointer">
+              <i data-lucide="play" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+              <span class="font-label text-label-lg" data-design-text-token="label-lg">Start Analysis</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Start Analysis Feedback -->
+        <div id="start-analysis-feedback" class="hidden bg-secondary-container border border-secondary text-on-secondary-container rounded-md p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0" aria-hidden="true"></i>
+            <span class="font-body text-body-md">Session <span class="font-mono text-mono-sm">SES-2026-085</span> queued in demonstration mode. Open Processing Centre to inspect pipeline stages.</span>
+          </div>
+          <a href="page05.html" class="font-label text-label-sm text-on-secondary-container underline shrink-0">View Progress</a>
+        </div>
+
+        <!-- Validation Error Banner -->
+        <div id="upload-validation-error" role="alert" class="hidden bg-error-container border border-error text-on-error-container rounded-md p-4 flex items-start gap-2.5">
+          <i data-lucide="alert-circle" class="w-4 h-4 text-error mt-0.5 shrink-0" aria-hidden="true"></i>
+          <p id="upload-validation-text" class="font-body text-body-md"></p>
+        </div>
+
+        <!-- Drag & Drop Upload Zone + Supported Formats -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-5 flex flex-col gap-4">
+            <label id="upload-drop-zone" for="pdf-file-input" class="bg-surface-paper border-2 border-dashed border-outline hover:border-primary rounded-lg p-8 flex flex-col items-center text-center gap-4 cursor-pointer transition-colors duration-state-change">
+              <div class="w-12 h-12 rounded-md bg-primary-container border border-primary flex items-center justify-center">
+                <i data-lucide="file-up" class="w-5 h-5 text-primary" aria-hidden="true"></i>
+              </div>
+              <div class="flex flex-col gap-1">
+                <span class="font-title text-title-md text-on-surface">Drop PDF documents here</span>
+                <span class="font-body text-body-md text-on-surface-muted">or click to browse multiple files from your computer</span>
+              </div>
+              <span class="px-3 py-1.5 rounded bg-surface border border-outline font-label text-label-sm text-on-surface">Select PDF Files</span>
+              <input id="pdf-file-input" type="file" accept=".pdf,application/pdf" multiple class="sr-only">
+            </label>
+
+            <div class="bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-3">
+              <span class="font-mono text-mono-sm text-on-surface-muted">INGESTION CONSTRAINTS</span>
+              <ul class="flex flex-col gap-2 font-body text-body-md text-on-surface-muted">
+                <li class="flex items-center justify-between">
+                  <span>Supported formats</span>
+                  <span class="font-mono text-mono-sm text-on-surface">PDF (.pdf) only</span>
+                </li>
+                <li class="flex items-center justify-between">
+                  <span>Maximum file size</span>
+                  <span class="font-mono text-mono-sm text-on-surface tabular-nums">25 MB / file</span>
+                </li>
+                <li class="flex items-center justify-between">
+                  <span>Session batch limit</span>
+                  <span class="font-mono text-mono-sm text-on-surface tabular-nums">15 documents</span>
+                </li>
+                <li class="flex items-center justify-between">
+                  <span>OCR fallback</span>
+                  <span class="font-mono text-mono-sm text-secondary-text">Automatic</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Queued Document List -->
+          <div class="lg:col-span-7 bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b border-outline pb-3">
+              <h2 class="font-title text-title-lg text-on-surface">Session Document Queue</h2>
+              <span id="queue-count" class="font-mono text-mono-sm text-on-surface-muted tabular-nums">3 FILES IN SESSION</span>
+            </div>
+
+            <div id="file-queue-list" class="flex flex-col gap-3">
+              <!-- Valid Uploaded PDF 1 -->
+              <article data-file-item data-file-valid="true" class="bg-surface border border-outline rounded-lg p-4 flex flex-col gap-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-md bg-surface-paper border border-outline flex items-center justify-center shrink-0">
+                      <i data-lucide="file-text" class="w-4 h-4 text-primary" aria-hidden="true"></i>
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                      <span class="font-title text-title-md text-on-surface truncate">Q3_Compliance_Filing.pdf</span>
+                      <span class="font-mono text-mono-sm text-on-surface-muted tabular-nums">4.2 MB Â· 24 pages Â· SHA 8f91a2</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span data-file-status class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-secondary-container text-on-secondary-container border border-secondary font-label text-label-sm">Ready</span>
+                    <button type="button" data-remove-file aria-label="Remove Q3_Compliance_Filing.pdf" class="p-1.5 rounded border border-outline bg-surface-paper text-on-surface-muted hover:text-error hover:border-error cursor-pointer">
+                      <i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-surface-container overflow-hidden">
+                  <div data-progress-bar class="h-full bg-secondary w-full"></div>
+                </div>
+              </article>
+
+              <!-- Valid Uploaded PDF 2 -->
+              <article data-file-item data-file-valid="true" class="bg-surface border border-outline rounded-lg p-4 flex flex-col gap-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-md bg-surface-paper border border-outline flex items-center justify-center shrink-0">
+                      <i data-lucide="file-text" class="w-4 h-4 text-primary" aria-hidden="true"></i>
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                      <span class="font-title text-title-md text-on-surface truncate">Vendor_SLA_v4.pdf</span>
+                      <span class="font-mono text-mono-sm text-on-surface-muted tabular-nums">1.8 MB Â· 12 pages Â· SHA 3c40d1</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span data-file-status class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-secondary-container text-on-secondary-container border border-secondary font-label text-label-sm">Ready</span>
+                    <button type="button" data-remove-file aria-label="Remove Vendor_SLA_v4.pdf" class="p-1.5 rounded border border-outline bg-surface-paper text-on-surface-muted hover:text-error hover:border-error cursor-pointer">
+                      <i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-surface-container overflow-hidden">
+                  <div data-progress-bar class="h-full bg-secondary w-full"></div>
+                </div>
+              </article>
+
+              <!-- Failed / Retryable File Example -->
+              <article data-file-item data-file-valid="false" class="bg-surface border border-error rounded-lg p-4 flex flex-col gap-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-md bg-error-container border border-error flex items-center justify-center shrink-0">
+                      <i data-lucide="file-warning" class="w-4 h-4 text-error" aria-hidden="true"></i>
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                      <span class="font-title text-title-md text-on-surface truncate">Board_Minutes_Oct.pdf</span>
+                      <span class="font-mono text-mono-sm text-error tabular-nums">Upload interrupted at 64% Â· Retry required</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span data-file-status class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-error-container text-on-error-container border border-error font-label text-label-sm">Failed</span>
+                    <button type="button" data-retry-file class="px-2.5 py-1 rounded border border-outline bg-surface-paper font-label text-label-sm text-primary hover:border-primary cursor-pointer">Retry</button>
+                    <button type="button" data-remove-file aria-label="Remove Board_Minutes_Oct.pdf" class="p-1.5 rounded border border-outline bg-surface-paper text-on-surface-muted hover:text-error hover:border-error cursor-pointer">
+                      <i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-surface-container overflow-hidden">
+                  <div data-progress-bar class="h-full bg-error w-2/3"></div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+
+<script>
+  document.getElementById('start-analysis-btn')?.addEventListener('click', function () {
+    window.location.href = 'page05.html';
+  });
+</script>
+</body></html>

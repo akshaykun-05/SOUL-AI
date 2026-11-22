@@ -1,0 +1,433 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOUL AI â€” Honesty Benchmark</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'midnight-navy': '#10121B',
+        'royal-violet': '#7047EB',
+        'warm-ivory': '#F3F2EF',
+        'evidence-teal': '#34B89A',
+        'muted-grey': '#9295A2',
+        'primary': '#7047EB',
+        'on-primary': '#FFFFFF',
+        'primary-hover': '#4D13C8',
+        'on-primary-hover': '#FFFFFF',
+        'primary-container': '#E7DEFF',
+        'on-primary-container': '#1F0060',
+        'secondary': '#34B89A',
+        'on-secondary': '#002019',
+        'secondary-text': '#006B57',
+        'secondary-container': '#B8FFE8',
+        'on-secondary-container': '#002019',
+        'surface': '#F3F2EF',
+        'surface-paper': '#FDFCF9',
+        'surface-container': '#E3E2DF',
+        'surface-container-low': '#F2F1EE',
+        'on-surface': '#10121B',
+        'on-surface-muted': '#5C5E69',
+        'outline': '#C7C6C4',
+        'outline-strong': '#91918E',
+        'surface-dark': '#10121B',
+        'surface-dark-elevated': '#191B24',
+        'surface-dark-container': '#2E303A',
+        'on-surface-dark': '#F3F2EF',
+        'on-surface-dark-muted': '#9295A2',
+        'outline-dark': '#2E303A',
+        'success': '#006B57',
+        'on-success': '#FFFFFF',
+        'success-container': '#B8FFE8',
+        'on-success-container': '#002019',
+        'error': '#BA1A1A',
+        'on-error': '#FFFFFF',
+        'error-container': '#FFDAD6',
+        'on-error-container': '#410002',
+        'warning': '#904D00',
+        'on-warning': '#FFFFFF',
+        'warning-container': '#FFDCC3',
+        'on-warning-container': '#2F1500',
+      },
+      borderRadius: {
+        'none': '0px',
+        'sm': '2px',
+        'DEFAULT': '4px',
+        'md': '6px',
+        'lg': '8px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '64px',
+        'section-lg': '96px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"IBM Plex Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['52px', { lineHeight: '58px', letterSpacing: '-1.2px', fontWeight: '700' }],
+        'display-lg-mobile': ['32px', { lineHeight: '38px', letterSpacing: '-0.6px', fontWeight: '700' }],
+        'headline-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.7px', fontWeight: '600' }],
+        'headline-lg-mobile': ['26px', { lineHeight: '32px', letterSpacing: '-0.4px', fontWeight: '600' }],
+        'headline-md': ['24px', { lineHeight: '32px', letterSpacing: '-0.3px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '-0.1px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'mono-md': ['13px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'mono-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '180ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      const mobileDrawer = document.getElementById('mobile-sidebar');
+      const closeDrawer = document.getElementById('close-sidebar');
+      if (sidebarToggle && mobileDrawer) sidebarToggle.addEventListener('click', () => mobileDrawer.classList.remove('hidden'));
+      if (closeDrawer && mobileDrawer) closeDrawer.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+
+      const caseRows = document.querySelectorAll('[data-test-case]');
+      const detailId = document.getElementById('case-detail-id');
+      const detailExpected = document.getElementById('case-detail-expected');
+      const detailPredicted = document.getElementById('case-detail-predicted');
+      const detailRationale = document.getElementById('case-detail-rationale');
+
+      caseRows.forEach((row) => {
+        row.addEventListener('click', () => {
+          caseRows.forEach((r) => r.classList.remove('bg-surface-container-low'));
+          row.classList.add('bg-surface-container-low');
+          detailId.textContent = row.getAttribute('data-case-id');
+          detailExpected.textContent = row.getAttribute('data-case-expected');
+          detailPredicted.textContent = row.getAttribute('data-case-predicted');
+          detailRationale.textContent = row.getAttribute('data-case-rationale');
+        });
+      });
+    });
+  </script>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased">
+  <div class="min-h-[1024px] flex flex-col lg:flex-row" data-stitch-vh="min-h-[1024px]===min-h-screen">
+
+    <!-- Persistent Desktop Sidebar (Midnight Navy) -->
+    <aside class="hidden lg:flex lg:w-64 lg:shrink-0 bg-surface-dark text-on-surface-dark border-r border-outline-dark flex-col justify-between min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen">
+      <div class="flex flex-col">
+        <div class="h-16 px-5 border-b border-outline-dark flex items-center gap-3">
+          <div class="w-8 h-8 rounded-md bg-surface-dark-elevated flex items-center justify-center border border-outline-dark shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="#34B89A" stroke-width="2"></rect>
+              <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="#7047EB" stroke-width="2"></rect>
+              <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="#F3F2EF" stroke-width="2"></rect>
+              <path d="M14 17H20M17 14V20" stroke="#34B89A" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="font-title text-title-md text-on-surface-dark">SOUL AI</span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted truncate">FORENSIC SUITE</span>
+          </div>
+        </div>
+
+        <nav aria-label="Workspace navigation" class="p-3 flex flex-col gap-1">
+          <span class="px-3 py-2 font-mono text-mono-sm text-on-surface-dark-muted">WORKSPACE</span>
+          <a href="page03.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Dashboard</span>
+          </a>
+          <a href="page04.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="upload-cloud" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Document Upload</span>
+          </a>
+          <a href="page05.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="cpu" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Processing Centre</span>
+          </a>
+
+          <span class="px-3 pt-4 pb-2 font-mono text-mono-sm text-on-surface-dark-muted">ANALYSIS</span>
+          <a href="page06.html" class="flex items-center justify-between px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <span class="flex items-center gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+              <span class="font-label text-label-lg">Verification Results</span>
+            </span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted tabular-nums">6</span>
+          </a>
+          <a href="page07.html" class="flex items-center justify-between px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <span class="flex items-center gap-3">
+              <i data-lucide="git-compare" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+              <span class="font-label text-label-lg">Contradictions</span>
+            </span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted tabular-nums">3</span>
+          </a>
+          <a href="page08.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="file-search" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Evidence Viewer</span>
+          </a>
+
+          <span class="px-3 pt-4 pb-2 font-mono text-mono-sm text-on-surface-dark-muted">GOVERNANCE</span>
+          <a href="page09.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-md bg-surface-dark-elevated text-on-surface-dark border border-outline-dark">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 text-primary shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Honesty Benchmark</span>
+          </a>
+          <a href="page10.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="file-check" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Audit Report</span>
+          </a>
+          <a href="page11.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="settings" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-outline-dark flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-mono-sm text-secondary">DEMO DATA MODE</span>
+          <span class="w-2 h-2 rounded-full bg-secondary" aria-hidden="true"></span>
+        </div>
+        <p class="font-mono text-mono-sm text-on-surface-dark-muted">Team Soul Society Â· Hack-A-Sol</p>
+      </div>
+    </aside>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-sidebar" class="hidden fixed inset-0 z-40 bg-surface-dark text-on-surface-dark p-6 flex flex-col justify-between lg:hidden">
+      <div class="flex flex-col gap-6">
+        <div class="flex items-center justify-between border-b border-outline-dark pb-4">
+          <span class="font-title text-title-lg text-on-surface-dark">SOUL AI</span>
+          <button id="close-sidebar" type="button" aria-label="Close navigation" class="p-2 rounded-md border border-outline-dark text-on-surface-dark">
+            <i data-lucide="x" class="w-4 h-4" aria-hidden="true"></i>
+          </button>
+        </div>
+        <nav class="flex flex-col gap-2">
+          <a href="page08.html" class="px-3 py-2 rounded-md font-label text-label-lg text-on-surface-dark-muted">Evidence Viewer</a>
+          <a href="page09.html" class="px-3 py-2 rounded-md bg-surface-dark-elevated font-label text-label-lg text-on-surface-dark">Honesty Benchmark</a>
+        </nav>
+      </div>
+      <span class="font-mono text-mono-sm text-on-surface-dark-muted">TEAM SOUL SOCIETY Â· DEMO MODE</span>
+    </div>
+
+    <!-- Main Workspace Area -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- Top Header (Shell Parity) -->
+      <header class="h-16 bg-surface-paper border-b border-outline px-gutter-md md:px-gutter-lg flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <button id="sidebar-toggle" type="button" aria-label="Open navigation" class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-outline bg-surface text-on-surface">
+            <i data-lucide="menu" class="w-4 h-4" aria-hidden="true"></i>
+          </button>
+          <h1 class="font-title text-title-lg text-on-surface truncate" data-design-text-token="title-lg">Honesty Benchmark</h1>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface border border-outline font-mono text-mono-sm text-on-surface-muted">
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary" aria-hidden="true"></span>
+            SAMPLE EVALUATION DATA
+          </span>
+          <a href="page04.html" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-primary text-on-primary hover:bg-primary-hover transition-colors duration-state-change ease-state-change shrink-0">
+            <i data-lucide="upload" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg" data-design-text-token="label-lg">Upload PDF</span>
+          </a>
+          <div class="hidden md:flex items-center gap-2.5 pl-3 border-l border-outline">
+            <div class="w-8 h-8 rounded-md bg-surface-dark text-on-surface-dark flex items-center justify-center font-mono text-mono-sm">AR</div>
+            <div class="flex flex-col">
+              <span class="font-label text-label-sm text-on-surface">Ananya Rao</span>
+              <span class="font-mono text-mono-sm text-on-surface-muted">Lead Auditor</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main id="benchmark" class="flex-1 p-gutter-md md:p-gutter-lg max-w-7xl w-full mx-auto flex flex-col gap-6">
+
+        <!-- Explicit Sample Data Notice -->
+        <div class="bg-primary-container border border-primary text-on-primary-container rounded-lg p-4 flex items-center justify-between gap-4">
+          <p class="font-body text-body-md">
+            <strong class="font-medium">Sample Evaluation Suite (N = 120 Cases):</strong> Metrics below represent the Hack-A-Sol sample evaluation dataset. Live backend evaluation runs will replace these figures automatically.
+          </p>
+          <span class="font-mono text-mono-sm shrink-0">EVAL-SAMPLE-V2</span>
+        </div>
+
+        <!-- 5 Key Evaluation Metrics -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch" aria-label="Honesty benchmark metrics">
+          <article class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col justify-between gap-2">
+            <span class="font-label text-label-sm text-on-surface-muted">Unsupported Rejection</span>
+            <span class="font-headline text-headline-md text-secondary-text tabular-nums">96.2%</span>
+            <span class="font-mono text-mono-sm text-on-surface-muted">Abstention rate</span>
+          </article>
+          <article class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col justify-between gap-2">
+            <span class="font-label text-label-sm text-on-surface-muted">Contradiction P / R</span>
+            <span class="font-headline text-headline-md text-on-surface tabular-nums">0.91 / 0.88</span>
+            <span class="font-mono text-mono-sm text-on-surface-muted">Precision / Recall</span>
+          </article>
+          <article class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col justify-between gap-2">
+            <span class="font-label text-label-sm text-on-surface-muted">Claim Accuracy</span>
+            <span class="font-headline text-headline-md text-on-surface tabular-nums">93.4%</span>
+            <span class="font-mono text-mono-sm text-on-surface-muted">112 / 120 cases</span>
+          </article>
+          <article class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col justify-between gap-2">
+            <span class="font-label text-label-sm text-on-surface-muted">Citation Accuracy</span>
+            <span class="font-headline text-headline-md text-on-surface tabular-nums">97.5%</span>
+            <span class="font-mono text-mono-sm text-on-surface-muted">Exact page match</span>
+          </article>
+          <article class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col justify-between gap-2">
+            <span class="font-label text-label-sm text-on-surface-muted">False Positive Rate</span>
+            <span class="font-headline text-headline-md text-error tabular-nums">2.1%</span>
+            <span class="font-mono text-mono-sm text-on-surface-muted">Target &lt; 3.0%</span>
+          </article>
+        </section>
+
+        <!-- Confusion Matrix & Benchmark History -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-6 bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+              <h2 class="font-title text-title-lg text-on-surface">Confusion Matrix (Sample)</h2>
+              <span class="font-mono text-mono-sm text-on-surface-muted">N = 120</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-center border-collapse">
+                <thead>
+                  <tr class="border-b border-outline">
+                    <th class="py-2 px-3 text-left font-mono text-mono-sm text-on-surface-muted">ACTUAL \ PRED</th>
+                    <th class="py-2 px-3 font-mono text-mono-sm text-on-surface-muted">Supported</th>
+                    <th class="py-2 px-3 font-mono text-mono-sm text-on-surface-muted">Contradicted</th>
+                    <th class="py-2 px-3 font-mono text-mono-sm text-on-surface-muted">Unsupported</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline font-mono text-mono-md tabular-nums">
+                  <tr>
+                    <td class="py-3 px-3 text-left text-mono-sm text-on-surface-muted">Supported (48)</td>
+                    <td class="py-3 px-3 bg-secondary-container text-on-secondary-container">45</td>
+                    <td class="py-3 px-3 text-on-surface-muted">1</td>
+                    <td class="py-3 px-3 text-on-surface-muted">2</td>
+                  </tr>
+                  <tr>
+                    <td class="py-3 px-3 text-left text-mono-sm text-on-surface-muted">Contradicted (32)</td>
+                    <td class="py-3 px-3 text-on-surface-muted">1</td>
+                    <td class="py-3 px-3 bg-error-container text-on-error-container">28</td>
+                    <td class="py-3 px-3 text-on-surface-muted">3</td>
+                  </tr>
+                  <tr>
+                    <td class="py-3 px-3 text-left text-mono-sm text-on-surface-muted">Unsupported (40)</td>
+                    <td class="py-3 px-3 text-on-surface-muted">1</td>
+                    <td class="py-3 px-3 text-on-surface-muted">0</td>
+                    <td class="py-3 px-3 bg-warning-container text-on-warning-container">39</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Benchmark History -->
+          <div class="lg:col-span-6 bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-4">
+            <h2 class="font-title text-title-lg text-on-surface">Benchmark Run History</h2>
+            <div class="flex flex-col divide-y divide-outline">
+              <div class="py-3 flex items-center justify-between gap-2">
+                <div>
+                  <span class="font-mono text-mono-sm text-primary">RUN-042 Â· Current Pipeline</span>
+                  <p class="font-body text-body-md text-on-surface-muted">Strict abstention threshold + cross-doc entity check</p>
+                </div>
+                <span class="font-mono text-mono-md text-secondary-text tabular-nums">93.4% ACC</span>
+              </div>
+              <div class="py-3 flex items-center justify-between gap-2">
+                <div>
+                  <span class="font-mono text-mono-sm text-on-surface-muted">RUN-039 Â· Baseline</span>
+                  <p class="font-body text-body-md text-on-surface-muted">Dense retrieval without entity-attribute contradiction pass</p>
+                </div>
+                <span class="font-mono text-mono-md text-on-surface-muted tabular-nums">86.1% ACC</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Test Case Breakdown & Individual Inspector -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-7 bg-surface-paper border border-outline rounded-lg overflow-hidden">
+            <div class="p-4 border-b border-outline flex items-center justify-between">
+              <h2 class="font-title text-title-lg text-on-surface">Test Case Breakdown</h2>
+              <span class="font-mono text-mono-sm text-on-surface-muted">CLICK ROW TO INSPECT</span>
+            </div>
+            <div class="divide-y divide-outline">
+              <button type="button" data-test-case data-case-id="TC-104" data-case-expected="Not found in documents" data-case-predicted="Not found in documents" data-case-rationale="Correctly abstained when asked about Frankfurt data residency absent from uploaded corpus." class="w-full text-left p-4 bg-surface-container-low hover:bg-surface-container-low flex items-center justify-between gap-3 cursor-pointer">
+                <div>
+                  <span class="font-mono text-mono-sm text-on-surface-muted">TC-104 Â· Abstention Test</span>
+                  <p class="font-body text-body-md text-on-surface">Unmentioned Frankfurt subprocessor residency</p>
+                </div>
+                <span class="font-mono text-mono-sm text-success shrink-0">PASS</span>
+              </button>
+
+              <button type="button" data-test-case data-case-id="TC-108" data-case-expected="Contradicted" data-case-predicted="Contradicted" data-case-rationale="Detected 99.95% vs 99.50% SLA discrepancy across Vendor_SLA_v4.pdf and Board_Minutes_Oct.pdf." class="w-full text-left p-4 hover:bg-surface-container-low flex items-center justify-between gap-3 cursor-pointer">
+                <div>
+                  <span class="font-mono text-mono-sm text-on-surface-muted">TC-108 Â· Numerical Conflict</span>
+                  <p class="font-body text-body-md text-on-surface">Cross-document uptime SLA variance</p>
+                </div>
+                <span class="font-mono text-mono-sm text-success shrink-0">PASS</span>
+              </button>
+
+              <button type="button" data-test-case data-case-id="TC-112" data-case-expected="Supported" data-case-predicted="Unsupported" data-case-rationale="False negative: acronym expansion differed between table header and claim wording." class="w-full text-left p-4 hover:bg-surface-container-low flex items-center justify-between gap-3 cursor-pointer">
+                <div>
+                  <span class="font-mono text-mono-sm text-on-surface-muted">TC-112 Â· Synonym Recall</span>
+                  <p class="font-body text-body-md text-on-surface">SOC 2 Type II acronym phrasing variance</p>
+                </div>
+                <span class="font-mono text-mono-sm text-error shrink-0">MISS</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-3">
+            <span class="font-mono text-mono-sm text-on-surface-muted">INDIVIDUAL TEST CASE DETAIL</span>
+            <h3 id="case-detail-id" class="font-headline text-headline-md text-on-surface">TC-104</h3>
+            <div class="flex items-center justify-between border-t border-outline pt-3">
+              <span class="font-label text-label-sm text-on-surface-muted">Expected</span>
+              <span id="case-detail-expected" class="font-mono text-mono-sm text-on-surface">Not found in documents</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-label text-label-sm text-on-surface-muted">Predicted</span>
+              <span id="case-detail-predicted" class="font-mono text-mono-sm text-secondary-text">Not found in documents</span>
+            </div>
+            <p id="case-detail-rationale" class="font-body text-body-md text-on-surface-muted border-t border-outline pt-3">
+              Correctly abstained when asked about Frankfurt data residency absent from uploaded corpus.
+            </p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+
+</body></html>
