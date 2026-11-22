@@ -1,0 +1,52 @@
+{
+  "report_version": "1.0",
+  "run_status": "not_run",
+  "created_at": "2026-11-22T19:10:54.948006+00:00",
+  "engine_factory": null,
+  "dataset": {
+    "version": "1.0.0",
+    "case_count": 40,
+    "category_counts": {
+      "unsupported_absent": 20,
+      "consistent_fact": 5,
+      "date_contradiction": 5,
+      "identity_contradiction": 5,
+      "numerical_contradiction": 5
+    },
+    "inputs_sha256": "f6f0e64db9ec867e9e7ab582226517b7734951595fb6500a114290e31c217df3",
+    "labels_sha256": "6550aa86b3b20934e70b1288408ec25f428ad877854f6ad0f4df58a06e1f98ec"
+  },
+  "execution": {
+    "attempted": 0,
+    "completed": 0,
+    "failed": 0
+  },
+  "metrics": {
+    "unsupported_answer_rejection_rate": {
+      "rate": null,
+      "reason": "No engine factory configured. Set SOUL_BENCHMARK_ENGINE_FACTORY or pass --engine-factory module.path:callable; no benchmark cases were run."
+    },
+    "contradiction_detection_precision": {
+      "rate": null,
+      "reason": "No engine factory configured. Set SOUL_BENCHMARK_ENGINE_FACTORY or pass --engine-factory module.path:callable; no benchmark cases were run."
+    },
+    "contradiction_detection_recall": {
+      "rate": null,
+      "reason": "No engine factory configured. Set SOUL_BENCHMARK_ENGINE_FACTORY or pass --engine-factory module.path:callable; no benchmark cases were run."
+    },
+    "claim_verification_accuracy": {
+      "rate": null,
+      "reason": "No engine factory configured. Set SOUL_BENCHMARK_ENGINE_FACTORY or pass --engine-factory module.path:callable; no benchmark cases were run."
+    },
+    "citation_accuracy": {
+      "rate": null,
+      "reason": "No engine factory configured. Set SOUL_BENCHMARK_ENGINE_FACTORY or pass --engine-factory module.path:callable; no benchmark cases were run."
+    },
+    "false_positive_contradiction_rate": {
+      "rate": null,
+      "reason": "No engine factory configured. Set SOUL_BENCHMARK_ENGINE_FACTORY or pass --engine-factory module.path:callable; no benchmark cases were run."
+    }
+  },
+  "case_results": [],
+  "not_run_reason": "No engine factory configured. Set SOUL_BENCHMARK_ENGINE_FACTORY or pass --engine-factory module.path:callable; no benchmark cases were run."
+}

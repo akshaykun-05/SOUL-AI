@@ -1,0 +1,825 @@
+{
+  "dataset_version": "1.0.0",
+  "cases": [
+    {
+      "case_id": "T012",
+      "category": "consistent_fact",
+      "expected_outcome": "answered",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [
+        {
+          "document_id": "T012-D1",
+          "entity": "Redwood lease",
+          "attribute": "deadline",
+          "value": "30 June 2027",
+          "unit": null,
+          "snippet": "Redwood lease deadline is 30 June 2027.",
+          "filename": "t012_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T012-D2",
+          "entity": "Redwood lease",
+          "attribute": "deadline",
+          "value": "June 30, 2027",
+          "unit": null,
+          "snippet": "Redwood lease deadline is June 30, 2027.",
+          "filename": "t012_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T003",
+      "category": "date_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "date",
+      "expected_facts": [
+        {
+          "document_id": "T003-D1",
+          "entity": "Indigo policy",
+          "attribute": "expiration date",
+          "value": "31 December 2026",
+          "unit": null,
+          "snippet": "Indigo policy expires on 31 December 2026.",
+          "filename": "t003_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T003-D2",
+          "entity": "Indigo policy",
+          "attribute": "expiration date",
+          "value": "31 December 2027",
+          "unit": null,
+          "snippet": "Indigo policy expires on 31 December 2027.",
+          "filename": "t003_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T035",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Mira Shah",
+        "attribute": "date of birth"
+      }
+    },
+    {
+      "case_id": "T004",
+      "category": "date_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "date",
+      "expected_facts": [
+        {
+          "document_id": "T004-D1",
+          "entity": "Harbor submission",
+          "attribute": "deadline",
+          "value": "2026-03-01",
+          "unit": null,
+          "snippet": "Harbor submission deadline is 2026-03-01.",
+          "filename": "t004_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T004-D2",
+          "entity": "Harbor submission",
+          "attribute": "deadline",
+          "value": "2026-03-10",
+          "unit": null,
+          "snippet": "Harbor submission deadline is 2026-03-10.",
+          "filename": "t004_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T010",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Meadow Supplies",
+        "attribute": "contact phone number"
+      }
+    },
+    {
+      "case_id": "T009",
+      "category": "numerical_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "numerical",
+      "expected_facts": [
+        {
+          "document_id": "T009-D1",
+          "entity": "Echo Trading",
+          "attribute": "credit limit",
+          "value": "USD 100,000",
+          "unit": "USD",
+          "snippet": "Echo Trading credit limit is USD 100,000.",
+          "filename": "t009_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T009-D2",
+          "entity": "Echo Trading",
+          "attribute": "credit limit",
+          "value": "USD 120,000",
+          "unit": "USD",
+          "snippet": "Echo Trading credit limit is USD 120,000.",
+          "filename": "t009_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T007",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Vendor",
+        "attribute": "bank account number"
+      }
+    },
+    {
+      "case_id": "T038",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Aurora project",
+        "attribute": "completion percentage"
+      }
+    },
+    {
+      "case_id": "T002",
+      "category": "numerical_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "numerical",
+      "expected_facts": [
+        {
+          "document_id": "T002-D1",
+          "entity": "Acme Ltd",
+          "attribute": "loan amount",
+          "value": "Rs. 6,00,000",
+          "unit": "INR",
+          "snippet": "Acme Ltd sanctioned loan amount is Rs. 6,00,000.",
+          "filename": "t002_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T002-D2",
+          "entity": "Acme Ltd",
+          "attribute": "loan amount",
+          "value": "Rs. 5,00,000",
+          "unit": "INR",
+          "snippet": "Acme Ltd sanctioned loan amount is Rs. 5,00,000.",
+          "filename": "t002_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T015",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Northstar contract",
+        "attribute": "jurisdiction"
+      }
+    },
+    {
+      "case_id": "T028",
+      "category": "numerical_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "numerical",
+      "expected_facts": [
+        {
+          "document_id": "T028-D1",
+          "entity": "Cobalt Ltd",
+          "attribute": "interest rate",
+          "value": "9.5%",
+          "unit": "percent",
+          "snippet": "Cobalt Ltd facility interest rate is 9.5 percent.",
+          "filename": "t028_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T028-D2",
+          "entity": "Cobalt Ltd",
+          "attribute": "interest rate",
+          "value": "10%",
+          "unit": "percent",
+          "snippet": "Cobalt Ltd facility interest rate is 10 percent.",
+          "filename": "t028_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T036",
+      "category": "consistent_fact",
+      "expected_outcome": "answered",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [
+        {
+          "document_id": "T036-D1",
+          "entity": "Quartz Cloud",
+          "attribute": "amount",
+          "value": "Rs. 6,00,000",
+          "unit": "annually INR",
+          "snippet": "Quartz Cloud subscription amount is Rs. 6,00,000 annually.",
+          "filename": "t036_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T036-D2",
+          "entity": "Quartz Cloud",
+          "attribute": "amount",
+          "value": "Rs. 50,000",
+          "unit": "monthly INR",
+          "snippet": "Quartz Cloud subscription amount is Rs. 50,000 monthly.",
+          "filename": "t036_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T011",
+      "category": "consistent_fact",
+      "expected_outcome": "answered",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [
+        {
+          "document_id": "T011-D1",
+          "entity": "Saffron agreement",
+          "attribute": "borrower name",
+          "value": "Aarav Mehta",
+          "unit": null,
+          "snippet": "Saffron agreement identifies Aarav Mehta as borrower.",
+          "filename": "t011_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T011-D2",
+          "entity": "Saffron agreement",
+          "attribute": "borrower name",
+          "value": "Aarav Mehta",
+          "unit": null,
+          "snippet": "Saffron schedule identifies Aarav Mehta as borrower.",
+          "filename": "t011_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T029",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Orion Ltd",
+        "attribute": "interest rate"
+      }
+    },
+    {
+      "case_id": "T018",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Greenfield property",
+        "attribute": "floor area"
+      }
+    },
+    {
+      "case_id": "T021",
+      "category": "date_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "date",
+      "expected_facts": [
+        {
+          "document_id": "T021-D1",
+          "entity": "Juniper filing",
+          "attribute": "due date",
+          "value": "30 April 2025",
+          "unit": null,
+          "snippet": "Juniper filing is due on 30 April 2025.",
+          "filename": "t021_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T021-D2",
+          "entity": "Juniper filing",
+          "attribute": "due date",
+          "value": "31 May 2025",
+          "unit": null,
+          "snippet": "Juniper filing is due on 31 May 2025.",
+          "filename": "t021_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T040",
+      "category": "identity_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "identity",
+      "expected_facts": [
+        {
+          "document_id": "T040-D1",
+          "entity": "Lumen Works",
+          "attribute": "director name",
+          "value": "Daniel Ortiz",
+          "unit": null,
+          "snippet": "Lumen Works filing lists Daniel Ortiz as director.",
+          "filename": "t040_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T040-D2",
+          "entity": "Lumen Works",
+          "attribute": "director name",
+          "value": "Daniel Ortega",
+          "unit": null,
+          "snippet": "Lumen Works filing lists Daniel Ortega as director.",
+          "filename": "t040_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T031",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Meridian contract",
+        "attribute": "renewal option"
+      }
+    },
+    {
+      "case_id": "T013",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Vega loan",
+        "attribute": "repayment frequency"
+      }
+    },
+    {
+      "case_id": "T027",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Acme Ltd",
+        "attribute": "annual revenue"
+      }
+    },
+    {
+      "case_id": "T023",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Juniper",
+        "attribute": "net profit FY2025"
+      }
+    },
+    {
+      "case_id": "T033",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Atlas device",
+        "attribute": "warranty duration"
+      }
+    },
+    {
+      "case_id": "T006",
+      "category": "identity_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "identity",
+      "expected_facts": [
+        {
+          "document_id": "T006-D1",
+          "entity": "Opal Services",
+          "attribute": "authorized signatory",
+          "value": "Kiran Das",
+          "unit": null,
+          "snippet": "Opal Services register lists Kiran Das as authorized signatory.",
+          "filename": "t006_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T006-D2",
+          "entity": "Opal Services",
+          "attribute": "authorized signatory",
+          "value": "Kiran Dutta",
+          "unit": null,
+          "snippet": "Opal Services register lists Kiran Dutta as authorized signatory.",
+          "filename": "t006_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T026",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Anika Rao",
+        "attribute": "guarantor name"
+      }
+    },
+    {
+      "case_id": "T005",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Solara service",
+        "attribute": "GST rate"
+      }
+    },
+    {
+      "case_id": "T022",
+      "category": "numerical_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "numerical",
+      "expected_facts": [
+        {
+          "document_id": "T022-D1",
+          "entity": "Birch House",
+          "attribute": "amount",
+          "value": "Rs. 6,00,000",
+          "unit": "annually INR",
+          "snippet": "Birch House annual lease amount is Rs. 6,00,000.",
+          "filename": "t022_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T022-D2",
+          "entity": "Birch House",
+          "attribute": "amount",
+          "value": "Rs. 5,40,000",
+          "unit": "annually INR",
+          "snippet": "Birch House annual lease amount is Rs. 5,40,000.",
+          "filename": "t022_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T008",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Pinecone Labs",
+        "attribute": "employee count"
+      }
+    },
+    {
+      "case_id": "T016",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Nova Systems",
+        "attribute": "CEO name"
+      }
+    },
+    {
+      "case_id": "T017",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Helios policy",
+        "attribute": "commencement date"
+      }
+    },
+    {
+      "case_id": "T001",
+      "category": "identity_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "identity",
+      "expected_facts": [
+        {
+          "document_id": "T001-D1",
+          "entity": "Kestrel agreement",
+          "attribute": "borrower name",
+          "value": "Asha Menon",
+          "unit": null,
+          "snippet": "Kestrel agreement names Asha Menon as borrower.",
+          "filename": "t001_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T001-D2",
+          "entity": "Kestrel agreement",
+          "attribute": "borrower name",
+          "value": "Riya Menon",
+          "unit": null,
+          "snippet": "Kestrel agreement names Riya Menon as borrower.",
+          "filename": "t001_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T020",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Order 8842",
+        "attribute": "delivery date"
+      }
+    },
+    {
+      "case_id": "T019",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Cedar agreement",
+        "attribute": "late payment penalty amount"
+      }
+    },
+    {
+      "case_id": "T034",
+      "category": "identity_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "identity",
+      "expected_facts": [
+        {
+          "document_id": "T034-D1",
+          "entity": "Maple Retail",
+          "attribute": "borrower name",
+          "value": "Maple Retail Private Limited",
+          "unit": null,
+          "snippet": "Loan schedule names Maple Retail Private Limited as borrower.",
+          "filename": "t034_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T034-D2",
+          "entity": "Maple Retail",
+          "attribute": "borrower name",
+          "value": "Maple Retail LLP",
+          "unit": null,
+          "snippet": "Loan schedule names Maple Retail LLP as borrower.",
+          "filename": "t034_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T039",
+      "category": "unsupported_absent",
+      "expected_outcome": "insufficient_evidence",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [],
+      "unsupported_target": {
+        "entity": "Lease",
+        "attribute": "termination notice period"
+      }
+    },
+    {
+      "case_id": "T032",
+      "category": "consistent_fact",
+      "expected_outcome": "answered",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [
+        {
+          "document_id": "T032-D1",
+          "entity": "Topaz loan",
+          "attribute": "interest rate",
+          "value": "8.5%",
+          "unit": "percent",
+          "snippet": "Topaz loan interest rate is 8.5 percent.",
+          "filename": "t032_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T032-D2",
+          "entity": "Topaz loan",
+          "attribute": "interest rate",
+          "value": "8.5 percent",
+          "unit": null,
+          "snippet": "The interest rate for Topaz loan is 8.5 percent.",
+          "filename": "t032_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T037",
+      "category": "consistent_fact",
+      "expected_outcome": "answered",
+      "expected_conflict": false,
+      "expected_conflict_type": null,
+      "expected_facts": [
+        {
+          "document_id": "T037-D1",
+          "entity": "Umber Finance",
+          "attribute": "loan amount",
+          "value": "5 lakh",
+          "unit": "INR",
+          "snippet": "Umber Finance principal amount is INR 5 lakh.",
+          "filename": "t037_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T037-D2",
+          "entity": "Umber Finance",
+          "attribute": "loan amount",
+          "value": "Rs. 500,000",
+          "unit": null,
+          "snippet": "Umber Finance loan amount is Rs. 500,000.",
+          "filename": "t037_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T024",
+      "category": "numerical_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "numerical",
+      "expected_facts": [
+        {
+          "document_id": "T024-D1",
+          "entity": "Delta contract",
+          "attribute": "fee",
+          "value": "INR 25,000",
+          "unit": "INR",
+          "snippet": "Delta contract late fee is INR 25,000.",
+          "filename": "t024_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T024-D2",
+          "entity": "Delta contract",
+          "attribute": "fee",
+          "value": "INR 30,000",
+          "unit": "INR",
+          "snippet": "Delta contract late fee is INR 30,000.",
+          "filename": "t024_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T025",
+      "category": "identity_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "identity",
+      "expected_facts": [
+        {
+          "document_id": "T025-D1",
+          "entity": "Nacre Industries",
+          "attribute": "guarantor name",
+          "value": "Priya Shah",
+          "unit": null,
+          "snippet": "Nacre Industries agreement names Priya Shah as guarantor.",
+          "filename": "t025_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T025-D2",
+          "entity": "Nacre Industries",
+          "attribute": "guarantor name",
+          "value": "Prisha Shah",
+          "unit": null,
+          "snippet": "Nacre Industries agreement names Prisha Shah as guarantor.",
+          "filename": "t025_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T030",
+      "category": "date_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "date",
+      "expected_facts": [
+        {
+          "document_id": "T030-D1",
+          "entity": "Falcon loan",
+          "attribute": "deadline",
+          "value": "30 June 2027",
+          "unit": null,
+          "snippet": "Falcon loan repayment deadline is 30 June 2027.",
+          "filename": "t030_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T030-D2",
+          "entity": "Falcon loan",
+          "attribute": "deadline",
+          "value": "15 July 2027",
+          "unit": null,
+          "snippet": "Falcon loan repayment deadline is 15 July 2027.",
+          "filename": "t030_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    },
+    {
+      "case_id": "T014",
+      "category": "date_contradiction",
+      "expected_outcome": "conflict",
+      "expected_conflict": true,
+      "expected_conflict_type": "date",
+      "expected_facts": [
+        {
+          "document_id": "T014-D1",
+          "entity": "Grove agreement",
+          "attribute": "effective date",
+          "value": "1 January 2025",
+          "unit": null,
+          "snippet": "Grove agreement effective date is 1 January 2025.",
+          "filename": "t014_source_a.pdf",
+          "page_number": 1
+        },
+        {
+          "document_id": "T014-D2",
+          "entity": "Grove agreement",
+          "attribute": "effective date",
+          "value": "15 January 2025",
+          "unit": null,
+          "snippet": "Grove agreement effective date is 15 January 2025.",
+          "filename": "t014_source_b.pdf",
+          "page_number": 2
+        }
+      ]
+    }
+  ]
+}
