@@ -395,3 +395,96 @@ Never place API credentials in source files or commit `.env`.
 ```powershell
 pytest
 ```
+
+## Phase 7 integration layer
+
+`SOULAIEngineService` in `soul_ai.integration` is the backend-facing interface.
+It owns an in-memory evidence index for a process and exposes `extract_documents`,
+`retrieve_evidence`, `extract_claims`, `verify_claims`, `detect_contradictions`,
+`answer`, and `evaluate_benchmark`. Extraction/retrieval/contradiction operations
+are synchronous; model-backed operations are async. Each returns the same JSON
+envelope: `{request_id, status, data, error}`. Success has `data` and null
+`error`; failure has null `data` and `{code,message,retryable}`. Detailed result
+schemas remain the Phase 1–6 Pydantic models; generated JSON Schema is available
+with `Model.model_json_schema()` and upload contract via `PdfUpload`.
+
+The optional FastAPI router is mounted with `app.include_router(create_router(service))`
+from `soul_ai.integration.router`. This adds `/soul-ai/documents/extract` and
+`/soul-ai/answer`; other operations are available as service calls. The engine
+does not own or modify the main backend or React application.
+
+### Backend request and response
+
+PDFs use base64 JSON in this integration contract (a backend may instead call
+`PdfIngestor` with raw bytes and persist evidence itself):
+
+```json
+{"request_id":"req-001","documents":[{"document_id":"doc-001","filename":"agreement.pdf","content_base64":"JVBERi0x..."}]}
+```
+
+Successful extraction data contains `documents` (each includes the original
+document ID, filename, digest, page count, extraction status and evidence) and
+`evidence_count`. Each evidence item preserves `evidence_id`, `document_id`,
+`filename`, 1-based `page_number`, exact `extracted_text`, offsets, optional
+bounding box, extraction method, and optional OCR confidence. The response
+endpoint accepts:
+
+```json
+{"request_id":"req-002","question":"What is the loan amount?","document_ids":["doc-001"]}
+```
+
+The answer response's `data` is the `ZeroGuessingResponse`: `status` is
+`answered`, `insufficient_evidence`, or `conflict`; citations in supported
+claims include verbatim snippet, filename, and page. Conflict results include
+both source records. Example frontend object:
+
+```json
+{"request_id":"req-002","status":"success","data":{"status":"conflict","answer":"The uploaded documents contain conflicting information: ...","claims":[],"conflicts":[{"entity":"Acme Ltd","attribute":"loan amount","value_1":"INR 600,000 INR","value_2":"INR 550,000 INR","source_1":{"filename":"agreement.pdf","page_number":1,"snippet":"Acme Ltd loan amount is INR 600,000.","document_id":"doc-001","document_version":null,"temporal_context":null},"source_2":{"filename":"letter.pdf","page_number":1,"snippet":"Acme Ltd loan amount is INR 550,000.","document_id":"doc-002","document_version":null,"temporal_context":null},"contradiction_type":"amount_conflict","explanation":"Both documents support different values for the same entity and attribute.","requires_human_review":false}],"requires_human_review":false},"error":null}
+```
+
+Supported-answer `data` example (wrapped in the same `request_id/status/data/error`
+envelope):
+
+```json
+{"status":"answered","answer":"Acme Ltd loan amount is INR 600,000. [agreement.pdf, p. 1]","claims":[{"claim_id":"claim-id","claim_text":"Acme Ltd loan amount is INR 600,000.","evidence":[{"filename":"agreement.pdf","page_number":1,"text":"Acme Ltd loan amount is INR 600,000."}]}],"conflicts":[],"requires_human_review":false}
+```
+
+An operation error is returned as `{"request_id":"req-003","status":"error","data":null,"error":{"code":"DOCUMENT_EXTRACTION_FAILED","message":"Input is not a readable PDF","retryable":false}}`.
+
+### Provider setup and limitations
+
+The built-in adapter calls an OpenAI-compatible Chat Completions API using the
+Python standard library. Configure `SOUL_LLM_PROVIDER`, `SOUL_LLM_MODEL`,
+`SOUL_LLM_API_KEY`, and optionally `SOUL_LLM_BASE_URL` in the environment (or
+local `.env`); never commit credentials. The claim extractor and verifier are
+separate provider instances. Other model vendors can implement the small
+`LLMProvider.generate(LLMRequest) -> LLMResponse` protocol and be injected.
+Production retrieval is currently deterministic lexical matching in memory,
+not semantic/vector retrieval. Persisted indexes and authentication/rate limits
+belong in the owning backend. OCR requires the optional Python packages and a
+system Tesseract executable. The deterministic provider in `demos/` only
+understands the synthetic `Entity loan amount is INR number.` format; it is a
+reproducibility aid, not a general-purpose language model or production provider.
+
+### Reproducible three-document end-to-end demo
+
+From the `SOUL_AI` directory with the project dependencies installed:
+
+```powershell
+$env:PYTHONPATH = (Get-Location).Path
+python demos/phase7_three_documents.py
+```
+
+The command creates three PDFs in memory, extracts their actual text, runs the
+claim extraction and independent verification passes, and prints the detected
+INR 600,000 versus INR 550,000 conflict with both filenames and page 1. Evidence
+IDs and contradiction IDs are generated for each run. This local run verifies
+the integration path only; it does not measure general model quality. To run
+the benchmark using a configured model-backed factory, use the Phase 6 command
+and dataset instructions in `benchmark/README.md`.
+
+### Integration test results
+
+Run `pytest` from this directory. The Phase 7 slice can be run alone with
+`pytest tests/test_phase7_integration.py -q`; the complete suite validates all
+existing phases plus the service envelope and three-PDF conflict flow.
