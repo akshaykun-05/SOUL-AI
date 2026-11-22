@@ -1,0 +1,360 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOUL AI â€” Audit Report</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'midnight-navy': '#10121B',
+        'royal-violet': '#7047EB',
+        'warm-ivory': '#F3F2EF',
+        'evidence-teal': '#34B89A',
+        'muted-grey': '#9295A2',
+        'primary': '#7047EB',
+        'on-primary': '#FFFFFF',
+        'primary-hover': '#4D13C8',
+        'on-primary-hover': '#FFFFFF',
+        'primary-container': '#E7DEFF',
+        'on-primary-container': '#1F0060',
+        'secondary': '#34B89A',
+        'on-secondary': '#002019',
+        'secondary-text': '#006B57',
+        'secondary-container': '#B8FFE8',
+        'on-secondary-container': '#002019',
+        'surface': '#F3F2EF',
+        'surface-paper': '#FDFCF9',
+        'surface-container': '#E3E2DF',
+        'surface-container-low': '#F2F1EE',
+        'on-surface': '#10121B',
+        'on-surface-muted': '#5C5E69',
+        'outline': '#C7C6C4',
+        'outline-strong': '#91918E',
+        'surface-dark': '#10121B',
+        'surface-dark-elevated': '#191B24',
+        'surface-dark-container': '#2E303A',
+        'on-surface-dark': '#F3F2EF',
+        'on-surface-dark-muted': '#9295A2',
+        'outline-dark': '#2E303A',
+        'success': '#006B57',
+        'on-success': '#FFFFFF',
+        'success-container': '#B8FFE8',
+        'on-success-container': '#002019',
+        'error': '#BA1A1A',
+        'on-error': '#FFFFFF',
+        'error-container': '#FFDAD6',
+        'on-error-container': '#410002',
+        'warning': '#904D00',
+        'on-warning': '#FFFFFF',
+        'warning-container': '#FFDCC3',
+        'on-warning-container': '#2F1500',
+      },
+      borderRadius: {
+        'none': '0px',
+        'sm': '2px',
+        'DEFAULT': '4px',
+        'md': '6px',
+        'lg': '8px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '64px',
+        'section-lg': '96px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"IBM Plex Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['52px', { lineHeight: '58px', letterSpacing: '-1.2px', fontWeight: '700' }],
+        'display-lg-mobile': ['32px', { lineHeight: '38px', letterSpacing: '-0.6px', fontWeight: '700' }],
+        'headline-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.7px', fontWeight: '600' }],
+        'headline-lg-mobile': ['26px', { lineHeight: '32px', letterSpacing: '-0.4px', fontWeight: '600' }],
+        'headline-md': ['24px', { lineHeight: '32px', letterSpacing: '-0.3px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '-0.1px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'mono-md': ['13px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'mono-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '180ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      const mobileDrawer = document.getElementById('mobile-sidebar');
+      const closeDrawer = document.getElementById('close-sidebar');
+      if (sidebarToggle && mobileDrawer) sidebarToggle.addEventListener('click', () => mobileDrawer.classList.remove('hidden'));
+      if (closeDrawer && mobileDrawer) closeDrawer.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+
+      const exportBtn = document.getElementById('export-pdf-btn');
+      const exportNotice = document.getElementById('export-demo-notice');
+      exportBtn.addEventListener('click', () => {
+        exportNotice.classList.remove('hidden');
+      });
+    });
+  </script>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased">
+  <div class="min-h-[1024px] flex flex-col lg:flex-row" data-stitch-vh="min-h-[1024px]===min-h-screen">
+
+    <!-- Persistent Desktop Sidebar (Midnight Navy) -->
+    <aside class="hidden lg:flex lg:w-64 lg:shrink-0 bg-surface-dark text-on-surface-dark border-r border-outline-dark flex-col justify-between min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen">
+      <div class="flex flex-col">
+        <div class="h-16 px-5 border-b border-outline-dark flex items-center gap-3">
+          <div class="w-8 h-8 rounded-md bg-surface-dark-elevated flex items-center justify-center border border-outline-dark shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="#34B89A" stroke-width="2"></rect>
+              <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="#7047EB" stroke-width="2"></rect>
+              <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="#F3F2EF" stroke-width="2"></rect>
+              <path d="M14 17H20M17 14V20" stroke="#34B89A" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="font-title text-title-md text-on-surface-dark">SOUL AI</span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted truncate">FORENSIC SUITE</span>
+          </div>
+        </div>
+
+        <nav aria-label="Workspace navigation" class="p-3 flex flex-col gap-1">
+          <span class="px-3 py-2 font-mono text-mono-sm text-on-surface-dark-muted">WORKSPACE</span>
+          <a href="page03.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Dashboard</span>
+          </a>
+          <a href="page04.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="upload-cloud" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Document Upload</span>
+          </a>
+          <a href="page05.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="cpu" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Processing Centre</span>
+          </a>
+
+          <span class="px-3 pt-4 pb-2 font-mono text-mono-sm text-on-surface-dark-muted">ANALYSIS</span>
+          <a href="page06.html" class="flex items-center justify-between px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <span class="flex items-center gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+              <span class="font-label text-label-lg">Verification Results</span>
+            </span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted tabular-nums">6</span>
+          </a>
+          <a href="page07.html" class="flex items-center justify-between px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <span class="flex items-center gap-3">
+              <i data-lucide="git-compare" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+              <span class="font-label text-label-lg">Contradictions</span>
+            </span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted tabular-nums">3</span>
+          </a>
+          <a href="page08.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="file-search" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Evidence Viewer</span>
+          </a>
+
+          <span class="px-3 pt-4 pb-2 font-mono text-mono-sm text-on-surface-dark-muted">GOVERNANCE</span>
+          <a href="page09.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Honesty Benchmark</span>
+          </a>
+          <a href="page10.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-md bg-surface-dark-elevated text-on-surface-dark border border-outline-dark">
+            <i data-lucide="file-check" class="w-4 h-4 text-primary shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Audit Report</span>
+          </a>
+          <a href="page11.html" class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-dark-muted hover:text-on-surface-dark hover:bg-surface-dark-elevated transition-colors duration-state-change">
+            <i data-lucide="settings" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg">Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-outline-dark flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-mono-sm text-secondary">DEMO DATA MODE</span>
+          <span class="w-2 h-2 rounded-full bg-secondary" aria-hidden="true"></span>
+        </div>
+        <p class="font-mono text-mono-sm text-on-surface-dark-muted">Team Soul Society Â· Hack-A-Sol</p>
+      </div>
+    </aside>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-sidebar" class="hidden fixed inset-0 z-40 bg-surface-dark text-on-surface-dark p-6 flex flex-col justify-between lg:hidden">
+      <div class="flex flex-col gap-6">
+        <div class="flex items-center justify-between border-b border-outline-dark pb-4">
+          <span class="font-title text-title-lg text-on-surface-dark">SOUL AI</span>
+          <button id="close-sidebar" type="button" aria-label="Close navigation" class="p-2 rounded-md border border-outline-dark text-on-surface-dark">
+            <i data-lucide="x" class="w-4 h-4" aria-hidden="true"></i>
+          </button>
+        </div>
+        <nav class="flex flex-col gap-2">
+          <a href="page10.html" class="px-3 py-2 rounded-md bg-surface-dark-elevated font-label text-label-lg text-on-surface-dark">Audit Report</a>
+          <a href="page11.html" class="px-3 py-2 rounded-md font-label text-label-lg text-on-surface-dark-muted">Settings</a>
+        </nav>
+      </div>
+      <span class="font-mono text-mono-sm text-on-surface-dark-muted">TEAM SOUL SOCIETY Â· DEMO MODE</span>
+    </div>
+
+    <!-- Main Workspace Area -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- Top Header (Shell Parity) -->
+      <header class="h-16 bg-surface-paper border-b border-outline px-gutter-md md:px-gutter-lg flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <button id="sidebar-toggle" type="button" aria-label="Open navigation" class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-outline bg-surface text-on-surface">
+            <i data-lucide="menu" class="w-4 h-4" aria-hidden="true"></i>
+          </button>
+          <h1 class="font-title text-title-lg text-on-surface truncate" data-design-text-token="title-lg">Audit Report</h1>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface border border-outline font-mono text-mono-sm text-on-surface-muted">
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary" aria-hidden="true"></span>
+            DEMONSTRATION DATA
+          </span>
+          <a href="page04.html" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-primary text-on-primary hover:bg-primary-hover transition-colors duration-state-change ease-state-change shrink-0">
+            <i data-lucide="upload" class="w-4 h-4 shrink-0" aria-hidden="true"></i>
+            <span class="font-label text-label-lg" data-design-text-token="label-lg">Upload PDF</span>
+          </a>
+          <div class="hidden md:flex items-center gap-2.5 pl-3 border-l border-outline">
+            <div class="w-8 h-8 rounded-md bg-surface-dark text-on-surface-dark flex items-center justify-center font-mono text-mono-sm">AR</div>
+            <div class="flex flex-col">
+              <span class="font-label text-label-sm text-on-surface">Ananya Rao</span>
+              <span class="font-mono text-mono-sm text-on-surface-muted">Lead Auditor</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main id="report" class="flex-1 p-gutter-md md:p-gutter-lg max-w-5xl w-full mx-auto flex flex-col gap-6">
+
+        <!-- Report Header & Export Action -->
+        <section class="bg-surface-paper border border-outline rounded-lg p-6 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-mono-sm text-on-surface-muted">FORENSIC AUDIT REPORT Â· SES-2026-084</span>
+            <h2 class="font-headline text-headline-md text-on-surface">Q3 Compliance &amp; Vendor SLA Verification</h2>
+          </div>
+          <button id="export-pdf-btn" type="button" data-component-id="button-secondary" data-component-type="button" data-component-variant="secondary" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-surface-paper border border-outline hover:border-primary font-label text-label-lg text-on-surface cursor-pointer">
+            <i data-lucide="file-down" class="w-4 h-4 text-primary" aria-hidden="true"></i>
+            <span data-design-text-token="label-lg">Export Audit PDF</span>
+          </button>
+        </section>
+
+        <!-- Explicit Export Demonstration Mode Notice -->
+        <div id="export-demo-notice" class="hidden bg-warning-container border border-warning text-on-warning-container rounded-md p-4 flex items-center gap-3">
+          <i data-lucide="info" class="w-4 h-4 text-warning shrink-0" aria-hidden="true"></i>
+          <p class="font-body text-body-md">
+            <strong class="font-medium">Demonstration Mode:</strong> PDF report generation requires the backend export service. When connected, this action compiles a signed audit bundle with page-level citations.
+          </p>
+        </div>
+
+        <!-- Analysis Overview -->
+        <section class="bg-surface-paper border border-outline rounded-lg p-6 flex flex-col gap-4">
+          <h3 class="font-title text-title-lg text-on-surface border-b border-outline pb-3">1. Analysis Overview</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <span class="font-label text-label-sm text-on-surface-muted block">Documents</span>
+              <span class="font-headline text-headline-md text-on-surface tabular-nums">3</span>
+            </div>
+            <div>
+              <span class="font-label text-label-sm text-on-surface-muted block">Supported Claims</span>
+              <span class="font-headline text-headline-md text-secondary-text tabular-nums">34</span>
+            </div>
+            <div>
+              <span class="font-label text-label-sm text-on-surface-muted block">Contradictions</span>
+              <span class="font-headline text-headline-md text-error tabular-nums">3</span>
+            </div>
+            <div>
+              <span class="font-label text-label-sm text-on-surface-muted block">Unsupported</span>
+              <span class="font-headline text-headline-md text-warning tabular-nums">5</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Documents Analyzed -->
+        <section class="bg-surface-paper border border-outline rounded-lg p-6 flex flex-col gap-3">
+          <h3 class="font-title text-title-lg text-on-surface border-b border-outline pb-3">2. Documents Analyzed</h3>
+          <ul class="divide-y divide-outline font-mono text-mono-sm">
+            <li class="py-2.5 flex items-center justify-between gap-2">
+              <span class="text-on-surface">Q3_Compliance_Filing.pdf</span>
+              <span class="text-on-surface-muted">24 pages Â· SHA 8f91a2</span>
+            </li>
+            <li class="py-2.5 flex items-center justify-between gap-2">
+              <span class="text-on-surface">Vendor_SLA_v4.pdf</span>
+              <span class="text-on-surface-muted">12 pages Â· SHA 3c40d1</span>
+            </li>
+            <li class="py-2.5 flex items-center justify-between gap-2">
+              <span class="text-on-surface">Board_Minutes_Oct.pdf</span>
+              <span class="text-on-surface-muted">8 pages Â· SHA 9b12e4</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Findings Breakdown: Supported / Contradictions / Unsupported -->
+        <section class="bg-surface-paper border border-outline rounded-lg p-6 flex flex-col gap-5">
+          <h3 class="font-title text-title-lg text-on-surface border-b border-outline pb-3">3. Verification &amp; Contradiction Summary</h3>
+          <div class="flex flex-col gap-3">
+            <div class="p-3.5 rounded bg-surface-container-low border border-outline">
+              <span class="font-mono text-mono-sm text-secondary-text">SUPPORTED Â· CLM-014</span>
+              <p class="font-body text-body-md text-on-surface">SOC 2 Type II audit controls independently verified (Q3_Compliance_Filing.pdf, p. 14).</p>
+            </div>
+            <div class="p-3.5 rounded bg-surface-container-low border border-error">
+              <span class="font-mono text-mono-sm text-error">CONTRADICTION Â· CNF-001</span>
+              <p class="font-body text-body-md text-on-surface">Monthly Uptime SLA: 99.95% in Vendor_SLA_v4.pdf (p. 6) vs. 99.50% in Board_Minutes_Oct.pdf (p. 3).</p>
+            </div>
+            <div class="p-3.5 rounded bg-surface-container-low border border-warning">
+              <span class="font-mono text-mono-sm text-warning">UNSUPPORTED Â· CLM-023</span>
+              <p class="font-body text-body-md text-on-surface">Frankfurt-only subprocessor residency: Not found in documents.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Human Review Recommendations -->
+        <section class="bg-surface-dark text-on-surface-dark border border-outline-dark rounded-lg p-6 flex flex-col gap-3">
+          <span class="font-mono text-mono-sm text-secondary">4. HUMAN REVIEW RECOMMENDATIONS</span>
+          <p class="font-body text-body-md text-on-surface-dark-muted">
+            Legal and compliance reviewers should reconcile the three flagged SLA and retention contradictions before signing the Q4 vendor renewal, and request written confirmation for the five assertions marked Not found in documents.
+          </p>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+
+</body></html>

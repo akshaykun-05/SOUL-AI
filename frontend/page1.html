@@ -1,0 +1,592 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOUL AI â€” Evidence-Grounded Document Verification</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'midnight-navy': '#10121B',
+        'royal-violet': '#7047EB',
+        'warm-ivory': '#F3F2EF',
+        'evidence-teal': '#34B89A',
+        'muted-grey': '#9295A2',
+        'primary': '#7047EB',
+        'on-primary': '#FFFFFF',
+        'primary-hover': '#4D13C8',
+        'on-primary-hover': '#FFFFFF',
+        'primary-container': '#E7DEFF',
+        'on-primary-container': '#1F0060',
+        'secondary': '#34B89A',
+        'on-secondary': '#002019',
+        'secondary-text': '#006B57',
+        'secondary-container': '#B8FFE8',
+        'on-secondary-container': '#002019',
+        'surface': '#F3F2EF',
+        'surface-paper': '#FDFCF9',
+        'surface-container': '#E3E2DF',
+        'surface-container-low': '#F2F1EE',
+        'on-surface': '#10121B',
+        'on-surface-muted': '#5C5E69',
+        'outline': '#C7C6C4',
+        'outline-strong': '#91918E',
+        'surface-dark': '#10121B',
+        'surface-dark-elevated': '#191B24',
+        'surface-dark-container': '#2E303A',
+        'on-surface-dark': '#F3F2EF',
+        'on-surface-dark-muted': '#9295A2',
+        'outline-dark': '#2E303A',
+        'success': '#006B57',
+        'on-success': '#FFFFFF',
+        'success-container': '#B8FFE8',
+        'on-success-container': '#002019',
+        'error': '#BA1A1A',
+        'on-error': '#FFFFFF',
+        'error-container': '#FFDAD6',
+        'on-error-container': '#410002',
+        'warning': '#904D00',
+        'on-warning': '#FFFFFF',
+        'warning-container': '#FFDCC3',
+        'on-warning-container': '#2F1500',
+      },
+      borderRadius: {
+        'none': '0px',
+        'sm': '2px',
+        'DEFAULT': '4px',
+        'md': '6px',
+        'lg': '8px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '64px',
+        'section-lg': '96px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"IBM Plex Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['52px', { lineHeight: '58px', letterSpacing: '-1.2px', fontWeight: '700' }],
+        'display-lg-mobile': ['32px', { lineHeight: '38px', letterSpacing: '-0.6px', fontWeight: '700' }],
+        'headline-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.7px', fontWeight: '600' }],
+        'headline-lg-mobile': ['26px', { lineHeight: '32px', letterSpacing: '-0.4px', fontWeight: '600' }],
+        'headline-md': ['24px', { lineHeight: '32px', letterSpacing: '-0.3px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '-0.1px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+        'mono-md': ['13px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'mono-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '180ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      const tabButtons = document.querySelectorAll('[data-preview-tab]');
+      const claimCards = document.querySelectorAll('[data-claim-status]');
+
+      tabButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-preview-tab');
+          tabButtons.forEach((b) => {
+            const isActive = b === btn;
+            b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            b.classList.toggle('bg-surface-paper', isActive);
+            b.classList.toggle('text-on-surface', isActive);
+            b.classList.toggle('border-outline', isActive);
+            b.classList.toggle('text-on-surface-muted', !isActive);
+            b.classList.toggle('border-transparent', !isActive);
+          });
+
+          claimCards.forEach((card) => {
+            const status = card.getAttribute('data-claim-status');
+            if (target === 'all' || status === target) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
+          });
+        });
+      });
+
+      const mobileMenuBtn = document.getElementById('mobile-menu-toggle');
+      const mobileMenu = document.getElementById('mobile-nav-drawer');
+      if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+          const isHidden = mobileMenu.classList.contains('hidden');
+          mobileMenu.classList.toggle('hidden', !isHidden);
+          mobileMenuBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+        });
+      }
+    });
+  </script>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased selection:bg-primary-container selection:text-on-primary-container">
+  <div class="min-h-[1024px] flex flex-col" data-stitch-vh="min-h-[1024px]===min-h-screen">
+
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-30 bg-surface border-b border-outline">
+      <div class="max-w-7xl mx-auto px-gutter-md md:px-gutter-lg h-16 flex items-center justify-between gap-4">
+        <a href="#top" class="flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">
+          <div class="w-8 h-8 rounded-md bg-surface-dark flex items-center justify-center border border-outline-dark">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="#34B89A" stroke-width="2"></rect>
+              <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="#7047EB" stroke-width="2"></rect>
+              <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="#F3F2EF" stroke-width="2"></rect>
+              <path d="M14 17H20M17 14V20" stroke="#34B89A" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-title text-title-md text-on-surface tracking-tight" data-design-text-token="title-md">SOUL AI</span>
+            <span class="hidden sm:block font-mono text-mono-sm text-on-surface-muted" data-design-text-token="mono-sm">UNBIASED LOGICAL INTELLIGENCE</span>
+          </div>
+        </a>
+
+        <nav aria-label="Primary" class="hidden md:flex items-center gap-8">
+          <a href="#platform" class="font-label text-label-lg text-on-surface-muted hover:text-on-surface transition-colors duration-state-change">Platform</a>
+          <a href="#features" class="font-label text-label-lg text-on-surface-muted hover:text-on-surface transition-colors duration-state-change">Verification</a>
+          <a href="#workflow" class="font-label text-label-lg text-on-surface-muted hover:text-on-surface transition-colors duration-state-change">Workflow</a>
+          <a href="#honesty" class="font-label text-label-lg text-on-surface-muted hover:text-on-surface transition-colors duration-state-change">Honesty Standard</a>
+        </nav>
+
+        <div class="hidden md:flex items-center gap-3">
+          <a href="page2.html" data-component-id="button-secondary" data-component-type="button" data-component-variant="secondary" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-surface-paper text-on-surface border border-outline hover:border-outline-strong hover:bg-surface-container-low transition-colors duration-state-change ease-state-change">
+            <span class="font-label text-label-lg" data-design-text-token="label-lg">Sign In</span>
+          </a>
+          <a href="page2.html" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-primary text-on-primary hover:bg-primary-hover transition-colors duration-state-change ease-state-change">
+            <span class="font-label text-label-lg" data-design-text-token="label-lg">Start Verification</span>
+            <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <button id="mobile-menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false" class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-md bg-surface-paper border border-outline text-on-surface">
+          <i data-lucide="menu" class="w-5 h-5" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation Drawer -->
+      <div id="mobile-nav-drawer" class="hidden md:hidden border-t border-outline bg-surface-paper px-gutter-md py-4 flex flex-col gap-3">
+        <a href="#platform" class="font-label text-label-lg text-on-surface py-1">Platform</a>
+        <a href="#features" class="font-label text-label-lg text-on-surface py-1">Verification</a>
+        <a href="#workflow" class="font-label text-label-lg text-on-surface py-1">Workflow</a>
+        <a href="#honesty" class="font-label text-label-lg text-on-surface py-1">Honesty Standard</a>
+        <div class="pt-2 border-t border-outline flex flex-col gap-2">
+          <a href="page2.html" class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-surface border border-outline font-label text-label-lg text-on-surface">Sign In</a>
+          <a href="page2.html" class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-primary font-label text-label-lg text-on-primary">Start Verification</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="top" class="flex-1">
+
+      <!-- Hero Section -->
+      <section class="max-w-7xl mx-auto px-gutter-md md:px-gutter-lg pt-12 md:pt-20 pb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+          <div class="lg:col-span-8 flex flex-col gap-6">
+            <div class="inline-flex items-center gap-2 self-start px-2.5 py-1 rounded bg-surface-paper border border-outline">
+              <span class="w-2 h-2 rounded-full bg-secondary" aria-hidden="true"></span>
+              <span class="font-mono text-mono-sm text-on-surface-muted" data-design-text-token="mono-sm">EVIDENCE-GROUNDED DOCUMENT INTELLIGENCE Â· HACK-A-SOL</span>
+            </div>
+
+            <h1 class="font-display text-display-lg-mobile md:text-display-lg text-on-surface text-balance" data-design-text-token="display-lg">
+              Every claim. Every source. Every truth.
+            </h1>
+
+            <p class="font-body text-body-lg text-on-surface-muted max-w-2xl text-pretty" data-design-text-token="body-lg">
+              SOUL AI ingests multi-document bundles, decomposes assertions into atomic claims, verifies each claim against verbatim source passages, flags cross-document contradictions, and rejects unsupported information without guessing.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-4 pt-2">
+              <a href="page2.html" data-component-id="button-with-icon" data-component-type="button" data-component-variant="with-icon" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-md bg-primary text-on-primary hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface transition-colors duration-state-change ease-state-change">
+                <i data-lucide="shield-check" class="w-4 h-4" aria-hidden="true"></i>
+                <span class="font-label text-label-lg" data-design-text-token="label-lg">Start Verification</span>
+              </a>
+              <a href="#platform" data-component-id="button-secondary" data-component-type="button" data-component-variant="secondary" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-surface-paper text-on-surface border border-outline hover:border-outline-strong hover:bg-surface-container-low focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors duration-state-change ease-state-change">
+                <i data-lucide="layers" class="w-4 h-4 text-on-surface-muted" aria-hidden="true"></i>
+                <span class="font-label text-label-lg" data-design-text-token="label-lg">Explore Platform</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Forensic Summary Ledger -->
+          <div class="lg:col-span-4 bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b border-outline pb-3">
+              <span class="font-mono text-mono-sm text-on-surface-muted" data-design-text-token="mono-sm">VERIFICATION GUARANTEES</span>
+              <i data-lucide="lock" class="w-3.5 h-3.5 text-on-surface-muted" aria-hidden="true"></i>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1">
+                <span class="font-mono text-mono-md text-on-surface tabular-nums" data-design-text-token="mono-md">100%</span>
+                <span class="font-label text-label-sm text-on-surface-muted" data-design-text-token="label-sm">Source-cited claims</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <span class="font-mono text-mono-md text-on-surface tabular-nums" data-design-text-token="mono-md">0%</span>
+                <span class="font-label text-label-sm text-on-surface-muted" data-design-text-token="label-sm">Speculative synthesis</span>
+              </div>
+            </div>
+            <p class="font-body text-body-md text-on-surface-muted border-t border-outline pt-3" data-design-text-token="body-md">
+              When evidence is absent, SOUL AI explicitly returns <span class="font-mono text-mono-sm text-on-surface">Not found in documents</span>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Product Interface Preview -->
+      <section id="platform" class="max-w-7xl mx-auto px-gutter-md md:px-gutter-lg pb-section">
+        <div class="border border-outline-dark rounded-lg overflow-hidden bg-surface-dark">
+          <!-- Preview Window Chrome -->
+          <div class="px-5 py-3 bg-surface-dark-elevated border-b border-outline-dark flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-mono-sm text-on-surface-dark" data-design-text-token="mono-sm">SESSION Â· SES-2026-084</span>
+              <span class="hidden sm:inline-block text-on-surface-dark-muted font-mono text-mono-sm">Â·</span>
+              <span class="hidden sm:inline-block font-mono text-mono-sm text-on-surface-dark-muted" data-design-text-token="mono-sm">3 DOCUMENTS Â· 42 ATOMIC CLAIMS</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-dark-container text-on-surface-dark font-mono text-mono-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary" aria-hidden="true"></span>
+                DEMONSTRATION PREVIEW
+              </span>
+            </div>
+          </div>
+
+          <!-- Split Workbench Preview -->
+          <div class="grid grid-cols-1 lg:grid-cols-12">
+            <!-- Left Dark Analysis Rail -->
+            <aside class="lg:col-span-4 bg-surface-dark p-5 border-b lg:border-b-0 lg:border-r border-outline-dark flex flex-col gap-6">
+              <div class="flex flex-col gap-3">
+                <span class="font-mono text-mono-sm text-on-surface-dark-muted" data-design-text-token="mono-sm">INGESTED CORPUS</span>
+                <div class="flex flex-col gap-2">
+                  <div class="p-3 rounded bg-surface-dark-elevated border border-outline-dark flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <i data-lucide="file-text" class="w-4 h-4 text-secondary shrink-0" aria-hidden="true"></i>
+                      <span class="font-mono text-mono-sm text-on-surface-dark truncate">Q3_Compliance_Filing.pdf</span>
+                    </div>
+                    <span class="font-mono text-mono-sm text-on-surface-dark-muted shrink-0 tabular-nums">24 pp</span>
+                  </div>
+                  <div class="p-3 rounded bg-surface-dark-elevated border border-outline-dark flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <i data-lucide="file-text" class="w-4 h-4 text-primary shrink-0" aria-hidden="true"></i>
+                      <span class="font-mono text-mono-sm text-on-surface-dark truncate">Vendor_SLA_v4.pdf</span>
+                    </div>
+                    <span class="font-mono text-mono-sm text-on-surface-dark-muted shrink-0 tabular-nums">12 pp</span>
+                  </div>
+                  <div class="p-3 rounded bg-surface-dark-elevated border border-outline-dark flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <i data-lucide="file-text" class="w-4 h-4 text-on-surface-dark-muted shrink-0" aria-hidden="true"></i>
+                      <span class="font-mono text-mono-sm text-on-surface-dark truncate">Board_Minutes_Oct.pdf</span>
+                    </div>
+                    <span class="font-mono text-mono-sm text-on-surface-dark-muted shrink-0 tabular-nums">8 pp</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-3 pt-4 border-t border-outline-dark">
+                <span class="font-mono text-mono-sm text-on-surface-dark-muted" data-design-text-token="mono-sm">VERIFICATION BREAKDOWN</span>
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="p-2.5 rounded bg-surface-dark-elevated border border-outline-dark">
+                    <span class="block font-mono text-mono-md text-secondary tabular-nums">34</span>
+                    <span class="font-label text-label-sm text-on-surface-dark-muted">Supported</span>
+                  </div>
+                  <div class="p-2.5 rounded bg-surface-dark-elevated border border-outline-dark">
+                    <span class="block font-mono text-mono-md text-on-surface-dark tabular-nums">3</span>
+                    <span class="font-label text-label-sm text-on-surface-dark-muted">Conflicts</span>
+                  </div>
+                  <div class="p-2.5 rounded bg-surface-dark-elevated border border-outline-dark">
+                    <span class="block font-mono text-mono-md text-on-surface-dark-muted tabular-nums">5</span>
+                    <span class="font-label text-label-sm text-on-surface-dark-muted">Missing</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            <!-- Right Light Document-Reading Surface -->
+            <div class="lg:col-span-8 bg-surface p-5 md:p-6 flex flex-col gap-5">
+              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-outline pb-4">
+                <div class="flex flex-wrap items-center gap-2" role="tablist" aria-label="Sample claim filters">
+                  <button type="button" role="tab" aria-selected="true" data-preview-tab="all" class="px-3 py-1.5 rounded bg-surface-paper border border-outline font-label text-label-sm text-on-surface cursor-pointer">All Claims (3)</button>
+                  <button type="button" role="tab" aria-selected="false" data-preview-tab="supported" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Supported</button>
+                  <button type="button" role="tab" aria-selected="false" data-preview-tab="contradicted" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Contradicted</button>
+                  <button type="button" role="tab" aria-selected="false" data-preview-tab="unsupported" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Unsupported</button>
+                </div>
+                <span class="font-mono text-mono-sm text-on-surface-muted">CLICK-TO-SOURCE ACTIVE</span>
+              </div>
+
+              <div class="flex flex-col gap-4">
+                <!-- Supported Claim Card -->
+                <article data-claim-status="supported" class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono text-mono-sm text-on-surface-muted">CLM-014</span>
+                      <span data-component-id="badge-success" data-component-type="badge" data-component-variant="success" role="status" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-secondary-container text-on-secondary-container border border-secondary">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success" aria-hidden="true"></i>
+                        <span class="font-label text-label-sm" data-design-text-token="label-sm">Supported</span>
+                      </span>
+                    </div>
+                    <span class="font-mono text-mono-sm text-secondary-text">Q3_Compliance_Filing.pdf Â· p. 14</span>
+                  </div>
+                  <p class="font-body text-body-md text-on-surface">
+                    SOC 2 Type II audit controls were independently verified across all production clusters in Q3 2026.
+                  </p>
+                  <div class="bg-surface-container-low border border-outline rounded p-3 flex flex-col gap-1">
+                    <span class="font-mono text-mono-sm text-on-surface-muted">VERBATIM SOURCE EXCERPT</span>
+                    <p class="font-body text-body-md text-on-surface">
+                      â€œIndependent attestation confirmed zero material exceptions across production infrastructure during the Q3 2026 audit window.â€
+                    </p>
+                  </div>
+                </article>
+
+                <!-- Contradicted Claim Card -->
+                <article data-claim-status="contradicted" class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono text-mono-sm text-on-surface-muted">CLM-019</span>
+                      <span data-component-id="badge-error" data-component-type="badge" data-component-variant="error" role="status" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-error-container text-on-error-container border border-error">
+                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-error" aria-hidden="true"></i>
+                        <span class="font-label text-label-sm" data-design-text-token="label-sm">Contradicted</span>
+                      </span>
+                    </div>
+                    <span class="font-mono text-mono-sm text-on-surface-muted">Entity: Uptime SLA Threshold</span>
+                  </div>
+                  <p class="font-body text-body-md text-on-surface">
+                    Contractual uptime commitment differs between the signed vendor agreement and October board briefing.
+                  </p>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-surface-container-low border border-outline rounded p-3 flex flex-col gap-1">
+                      <span class="font-mono text-mono-sm text-on-surface-muted">SOURCE A Â· Vendor_SLA_v4.pdf Â· p. 6</span>
+                      <p class="font-mono text-mono-md text-on-surface">99.95% monthly availability</p>
+                    </div>
+                    <div class="bg-surface-container-low border border-outline rounded p-3 flex flex-col gap-1">
+                      <span class="font-mono text-mono-sm text-error">SOURCE B Â· Board_Minutes_Oct.pdf Â· p. 3</span>
+                      <p class="font-mono text-mono-md text-on-surface">99.50% baseline threshold</p>
+                    </div>
+                  </div>
+                </article>
+
+                <!-- Unsupported Claim Card -->
+                <article data-claim-status="unsupported" class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono text-mono-sm text-on-surface-muted">CLM-023</span>
+                      <span data-component-id="badge-warning" data-component-type="badge" data-component-variant="warning" role="status" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-warning-container text-on-warning-container border border-warning">
+                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-warning" aria-hidden="true"></i>
+                        <span class="font-label text-label-sm" data-design-text-token="label-sm">Not found in documents</span>
+                      </span>
+                    </div>
+                    <span class="font-mono text-mono-sm text-on-surface-muted">0 matching passages</span>
+                  </div>
+                  <p class="font-body text-body-md text-on-surface">
+                    Subprocessor data residency is restricted exclusively to Frankfurt availability zones.
+                  </p>
+                  <div class="bg-surface-container-low border border-outline rounded p-3 flex items-center justify-between gap-2">
+                    <span class="font-body text-body-md text-on-surface-muted">No supporting or contradicting evidence located in the uploaded corpus.</span>
+                    <span class="font-mono text-mono-sm text-warning shrink-0">REJECTED</span>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Core Capabilities (4 Features) -->
+      <section id="features" class="max-w-7xl mx-auto px-gutter-md md:px-gutter-lg py-section border-t border-outline">
+        <div class="flex flex-col gap-3 mb-10 max-w-2xl">
+          <span class="font-mono text-mono-sm text-primary" data-design-text-token="mono-sm">FORENSIC CAPABILITIES</span>
+          <h2 class="font-headline text-headline-lg-mobile md:text-headline-lg text-on-surface text-balance" data-design-text-token="headline-lg">
+            Built for verification, not plausible-sounding summaries.
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+          <!-- Feature 1: Claim Verification -->
+          <article class="bg-surface-paper border border-outline rounded-lg p-6 flex flex-col justify-between gap-4 h-full">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <div class="w-9 h-9 rounded-md bg-secondary-container border border-secondary flex items-center justify-center">
+                  <i data-lucide="check-square" class="w-4 h-4 text-success" aria-hidden="true"></i>
+                </div>
+                <span class="font-mono text-mono-sm text-on-surface-muted">ATOMIC DECOMPOSITION</span>
+              </div>
+              <h3 class="font-title text-title-lg text-on-surface" data-design-text-token="title-lg">Claim Verification</h3>
+              <p class="font-body text-body-md text-on-surface-muted" data-design-text-token="body-md">
+                Complex multi-clause statements are split into atomic, testable propositions and checked individually against retrieved source passages.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-outline flex items-center justify-between font-mono text-mono-sm text-on-surface-muted">
+              <span>Status: Supported / Contradicted / Unsupported</span>
+            </div>
+          </article>
+
+          <!-- Feature 2: Contradiction Detection -->
+          <article class="bg-surface-paper border border-outline rounded-lg p-6 flex flex-col justify-between gap-4 h-full">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <div class="w-9 h-9 rounded-md bg-error-container border border-error flex items-center justify-center">
+                  <i data-lucide="git-compare" class="w-4 h-4 text-error" aria-hidden="true"></i>
+                </div>
+                <span class="font-mono text-mono-sm text-on-surface-muted">CROSS-DOCUMENT DIFF</span>
+              </div>
+              <h3 class="font-title text-title-lg text-on-surface" data-design-text-token="title-lg">Contradiction Detection</h3>
+              <p class="font-body text-body-md text-on-surface-muted" data-design-text-token="body-md">
+                Identifies conflicting numerical values, dates, obligations, and entity attributes across separate documents with side-by-side Source A vs. Source B evidence.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-outline flex items-center justify-between font-mono text-mono-sm text-on-surface-muted">
+              <span>Entity Â· Attribute Â· Conflicting Values</span>
+            </div>
+          </article>
+
+          <!-- Feature 3: Click-to-Source -->
+          <article class="bg-surface-paper border border-outline rounded-lg p-6 flex flex-col justify-between gap-4 h-full">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <div class="w-9 h-9 rounded-md bg-primary-container border border-primary flex items-center justify-center">
+                  <i data-lucide="file-search" class="w-4 h-4 text-primary" aria-hidden="true"></i>
+                </div>
+                <span class="font-mono text-mono-sm text-on-surface-muted">EXACT PAGE CITATION</span>
+              </div>
+              <h3 class="font-title text-title-lg text-on-surface" data-design-text-token="title-lg">Click-to-Source</h3>
+              <p class="font-body text-body-md text-on-surface-muted" data-design-text-token="body-md">
+                Every verified claim links directly to the exact PDF filename, page number, and highlighted source passage in a split-screen forensic viewer.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-outline flex items-center justify-between font-mono text-mono-sm text-on-surface-muted">
+              <span>Direct Jump Â· Exact Page Â· Verbatim Excerpt</span>
+            </div>
+          </article>
+
+          <!-- Feature 4: Zero-Guessing Intelligence -->
+          <article id="honesty" class="bg-surface-paper border border-outline rounded-lg p-6 flex flex-col justify-between gap-4 h-full">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <div class="w-9 h-9 rounded-md bg-warning-container border border-warning flex items-center justify-center">
+                  <i data-lucide="shield-alert" class="w-4 h-4 text-warning" aria-hidden="true"></i>
+                </div>
+                <span class="font-mono text-mono-sm text-on-surface-muted">HONESTY BENCHMARKED</span>
+              </div>
+              <h3 class="font-title text-title-lg text-on-surface" data-design-text-token="title-lg">Zero-Guessing Intelligence</h3>
+              <p class="font-body text-body-md text-on-surface-muted" data-design-text-token="body-md">
+                Refuses to extrapolate or fill gaps from prior training data. Unsubstantiated claims are explicitly marked as not found in documents and routed for human review.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-outline flex items-center justify-between font-mono text-mono-sm text-on-surface-muted">
+              <span>Abstention-First Â· Human-in-the-Loop</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Workflow Explanation -->
+      <section id="workflow" class="bg-surface-dark text-on-surface-dark py-section border-t border-outline-dark">
+        <div class="max-w-7xl mx-auto px-gutter-md md:px-gutter-lg">
+          <div class="flex flex-col gap-3 mb-10 max-w-2xl">
+            <span class="font-mono text-mono-sm text-secondary" data-design-text-token="mono-sm">VERIFICATION PIPELINE</span>
+            <h2 class="font-headline text-headline-lg-mobile md:text-headline-lg text-on-surface-dark text-balance" data-design-text-token="headline-lg">
+              Deterministic stages from raw PDF to auditable report.
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
+            <div class="bg-surface-dark-elevated border border-outline-dark rounded-lg p-5 flex flex-col gap-2">
+              <span class="font-mono text-mono-sm text-secondary">STAGE 01</span>
+              <h3 class="font-title text-title-md text-on-surface-dark">Document Ingestion</h3>
+              <p class="font-body text-body-md text-on-surface-dark-muted">Parse multi-document PDFs with page-level OCR and structural indexing.</p>
+            </div>
+            <div class="bg-surface-dark-elevated border border-outline-dark rounded-lg p-5 flex flex-col gap-2">
+              <span class="font-mono text-mono-sm text-secondary">STAGE 02</span>
+              <h3 class="font-title text-title-md text-on-surface-dark">Atomic Extraction</h3>
+              <p class="font-body text-body-md text-on-surface-dark-muted">Isolate discrete factual claims with entity and attribute bindings.</p>
+            </div>
+            <div class="bg-surface-dark-elevated border border-outline-dark rounded-lg p-5 flex flex-col gap-2">
+              <span class="font-mono text-mono-sm text-secondary">STAGE 03</span>
+              <h3 class="font-title text-title-md text-on-surface-dark">Evidence Retrieval</h3>
+              <p class="font-body text-body-md text-on-surface-dark-muted">Locate verbatim supporting or refuting passages with page coordinates.</p>
+            </div>
+            <div class="bg-surface-dark-elevated border border-outline-dark rounded-lg p-5 flex flex-col gap-2">
+              <span class="font-mono text-mono-sm text-secondary">STAGE 04</span>
+              <h3 class="font-title text-title-md text-on-surface-dark">Contradiction Check</h3>
+              <p class="font-body text-body-md text-on-surface-dark-muted">Cross-reference overlapping entities across files to surface conflicts.</p>
+            </div>
+            <div class="bg-surface-dark-elevated border border-outline-dark rounded-lg p-5 flex flex-col gap-2">
+              <span class="font-mono text-mono-sm text-secondary">STAGE 05</span>
+              <h3 class="font-title text-title-md text-on-surface-dark">Audit Output</h3>
+              <p class="font-body text-body-md text-on-surface-dark-muted">Compile clickable citations and human review flags into an exportable report.</p>
+            </div>
+          </div>
+
+          <div id="start" class="mt-10 pt-8 border-t border-outline-dark flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex flex-col gap-1">
+              <h3 class="font-title text-title-lg text-on-surface-dark">Ready to audit a document bundle?</h3>
+              <p class="font-body text-body-md text-on-surface-dark-muted">Launch the verification workspace or inspect the honesty benchmark suite.</p>
+            </div>
+            <a href="page2.html" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-primary text-on-primary hover:bg-primary-hover transition-colors duration-state-change ease-state-change shrink-0">
+              <span class="font-label text-label-lg" data-design-text-token="label-lg">Start Verification</span>
+              <i data-lucide="arrow-right" class="w-4 h-4" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-dark text-on-surface-dark border-t border-outline-dark">
+      <div class="max-w-7xl mx-auto px-gutter-md md:px-gutter-lg py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="font-title text-title-md text-on-surface-dark">SOUL AI</span>
+            <span class="font-mono text-mono-sm text-on-surface-dark-muted">Â· Society of Unbiased &amp; Logical Intelligence</span>
+          </div>
+          <p class="font-body text-body-md text-on-surface-dark-muted">
+            Developed by <strong class="font-medium text-on-surface-dark">Team Soul Society</strong> for <strong class="font-medium text-on-surface-dark">Hack-A-Sol</strong>.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-6 font-mono text-mono-sm text-on-surface-dark-muted">
+          <a href="#platform" class="hover:text-on-surface-dark transition-colors">PLATFORM</a>
+          <a href="#features" class="hover:text-on-surface-dark transition-colors">VERIFICATION</a>
+          <a href="#workflow" class="hover:text-on-surface-dark transition-colors">PIPELINE</a>
+          <span>BUILD Â· HACK-A-SOL 2026</span>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+
+</body></html>
