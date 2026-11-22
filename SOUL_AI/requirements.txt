@@ -6,3 +6,5 @@ pydantic-settings>=2.6,<3.0
 python-dotenv>=1.0,<2.0
 pytest>=8.3,<10.0
 httpx>=0.27,<1.0
+# Optional OCR: also install a system Tesseract executable, then run
+# `pip install -e ".[ocr]"` from the SOUL_AI directory.
