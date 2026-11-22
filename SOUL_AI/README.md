@@ -1,6 +1,6 @@
-# SOUL AI - Phase 2
+# SOUL AI - Phase 4
 
-SOUL AI is an evidence-grounded document verification engine for Hack-A-Sol 5.0. Phase 1 adds page-aware PDF evidence extraction. Phase 2 turns retrieved evidence into conservative atomic claim candidates using the configurable LLM provider interface. Independent verification remains a future phase.
+SOUL AI is an evidence-grounded document verification engine for Hack-A-Sol 5.0. It extracts page-aware PDF evidence, generates atomic claim candidates, independently verifies claims, and compares verified facts across documents for contradictions or possible changes.
 
 ## Architecture overview
 
@@ -20,13 +20,16 @@ Tesseract OCR -> confidence-scored evidence
 Relevant evidence + question -> atomic claim extraction
         |
         v
-Candidate claims -> independent verification (future phase)
+Candidate claims -> separate verifier pass over all original evidence
+        |
+        v
+Cross-document comparison of verified facts
         |
         v
 Versioned JSON contract -> separate FastAPI backend / React frontend
 ```
 
-Phase 1 boundaries:
+Implemented phases:
 
 - `schemas/` contains Pydantic models for all core evidence objects.
 - `api/contracts.py` defines the backend-facing request and response models.
@@ -34,10 +37,17 @@ Phase 1 boundaries:
 - `config.py` reads model settings from environment variables.
 - `extraction/pdf.py` ingests PDFs, stores paragraph text, page offsets and available bounding boxes, flags sparse/empty pages, and optionally falls back to Tesseract OCR.
 - `claim_extraction/extractor.py` sends only the question and supplied evidence to an injected `LLMProvider`, validates its JSON response, checks cited evidence IDs, and conservatively rejects candidate details not found in cited text.
+- `verification/verifier.py` runs one dedicated verifier call per claim over every original evidence chunk. Candidate source IDs are not passed to the verifier. It validates filename, page, and each quoted snippet against original extracted text before returning citations.
+- `contradictions/detector.py` compares only `SUPPORTED` claims with checked source quotes. It matches normalized entities and attributes, normalizes common currencies, scaled numbers, percentages, dates, and payment periods, and returns both source snippets.
+- Equivalent periodic amounts (for example, 600,000 annually and 50,000 monthly) are normalized. Cross-currency amounts are not converted without a date-appropriate exchange rate; those findings require human review.
+- Supply known document version labels to distinguish a possible revision from a same-version conflict. Findings across versions are labeled `version_change` and require human review. Different temporal contexts are labeled `temporal_change`.
+- Ambiguous date formats, incompatible units, and differing contractual conditions require human review rather than being presented as certain contradictions.
+- Verification statuses are `SUPPORTED`, `CONTRADICTED`, and `UNSUPPORTED`. Invalid citations and low/unknown-confidence OCR cannot produce a definitive result; ambiguous evidence requires human review.
+- Numeric values and explicit currencies are compared deterministically before accepting a `SUPPORTED` result, including common scales such as lakh/lac and crore.
 - Claim extraction returns `answered`, `insufficient_evidence`, or `ambiguous`. Unanswered/ambiguous responses contain no claims.
 - Evidence IDs on claims are candidate sources, not proof. Every claim still requires independent verification.
 - OCR is opt-in and requires the Tesseract system executable. Missing OCR dependencies are reported as warnings; they never produce fabricated evidence.
-- Verification, frontend, and backend-owned application code are not implemented in this phase.
+- The verifier uses a dedicated injected `LLMProvider` instance; configure it separately from the answer/claim extraction provider in the application. Frontend and backend-owned application code are not implemented in this phase.
 
 ## Folder structure
 
@@ -57,6 +67,12 @@ SOUL_AI/
 │   ├── claim_extraction/
 │   │   ├── __init__.py
 │   │   └── extractor.py
+│   ├── verification/
+│   │   ├── __init__.py
+│   │   └── verifier.py
+│   ├── contradictions/
+│   │   ├── __init__.py
+│   │   └── detector.py
 │   ├── api/
 │   │   ├── __init__.py
 │   │   └── contracts.py
@@ -74,7 +90,9 @@ SOUL_AI/
     ├── test_schemas.py
     ├── test_contracts.py
     ├── test_pdf_extraction.py
-    └── test_claim_extraction.py
+    ├── test_claim_extraction.py
+    ├── test_claim_verification.py
+    └── test_contradictions.py
 ```
 
 ## PDF ingestion
@@ -113,7 +131,7 @@ result = await ClaimExtractor(provider).extract(
 )
 ```
 
-Each accepted claim includes `claim_id`, `claim_text`, `entity`, `attribute`, `value`, `unit`, `temporal_context`, and `source_evidence_ids`. A lexical check guards against details missing from cited text and rejects claims that bundle multiple detected numeric/date facts. That check is deliberately conservative and does not establish that a claim is true; independent verification belongs to the next phase.
+Each accepted claim includes `claim_id`, `claim_text`, `entity`, `attribute`, `value`, `unit`, `temporal_context`, and `source_evidence_ids`. A lexical check guards against details missing from cited text and rejects claims that bundle multiple detected numeric/date facts. That check is deliberately conservative and does not establish that a claim is true; independent verification is handled in Phase 3.
 
 Example result:
 
@@ -134,6 +152,86 @@ Example result:
     }
   ],
   "reason": null
+}
+```
+
+### Independent claim verification
+
+Use a verifier-specific provider instance, then pass the original Phase 1 evidence collection. The verifier ignores candidate evidence IDs and receives all source text so it can locate support or conflict independently.
+
+```python
+from soul_ai.verification import ClaimVerifier
+
+reports = await ClaimVerifier(verifier_provider).verify_many(
+    claims=claim_result.claims,
+    original_evidence=all_extracted_evidence,
+)
+```
+
+Every returned quote must be an exact substring of extracted source text with the same filename and page. A supported numeric claim must also match the cited number after deterministic normalization. Ambiguous claims, unverifiable citations, and low-confidence OCR return `UNSUPPORTED`; the latter two require human review.
+
+Sample report:
+
+```json
+{
+  "claim_id": "C001",
+  "claim_text": "The loan amount is Rs. 5 lakh",
+  "status": "SUPPORTED",
+  "evidence": [
+    {
+      "filename": "loan_agreement.pdf",
+      "page_number": 3,
+      "text": "The sanctioned loan amount is Rs. 5,00,000."
+    }
+  ],
+  "reason": "The source explicitly confirms the amount.",
+  "requires_human_review": false
+}
+```
+
+### Cross-document contradiction detection
+
+Pass Phase 2 claim candidates, Phase 3 verification reports, and the original evidence. Only independently `SUPPORTED` claims with citations that still match the original evidence are compared. Optional document version labels are keyed by document ID.
+
+```python
+from soul_ai.contradictions import ContradictionDetector
+
+findings = ContradictionDetector().detect(
+    claims=claim_result.claims,
+    verifications=verification_reports,
+    original_evidence=all_extracted_evidence,
+    document_versions={"doc-v1": "v1", "doc-v2": "v2"},
+)
+```
+
+Sample finding:
+
+```json
+{
+  "contradiction_id": "<generated UUID>",
+  "entity": "Acme Ltd",
+  "attribute": "loan amount",
+  "value_1": "Rs. 6,00,000",
+  "value_2": "Rs. 5,00,000",
+  "source_1": {
+    "filename": "agreement.pdf",
+    "page_number": 2,
+    "snippet": "The loan amount is Rs. 6,00,000.",
+    "document_id": "doc-v1",
+    "document_version": "v1",
+    "temporal_context": null
+  },
+  "source_2": {
+    "filename": "revised_agreement.pdf",
+    "page_number": 3,
+    "snippet": "The loan amount is Rs. 5,00,000.",
+    "document_id": "doc-v2",
+    "document_version": "v2",
+    "temporal_context": null
+  },
+  "contradiction_type": "version_change",
+  "explanation": "The values differ between document versions 'v1' and 'v2'; this may be an intentional revision.",
+  "requires_human_review": true
 }
 ```
 
