@@ -113,6 +113,8 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="config.js"></script>
+  <script src="soul-api.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
@@ -131,6 +133,11 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       const queueCount = document.getElementById('queue-count');
       const startBtn = document.getElementById('start-analysis-btn');
       const startFeedback = document.getElementById('start-analysis-feedback');
+      const pendingFiles = new Map();
+
+      // The original queue contains illustrative demo cards. A live session
+      // starts empty so only files actually selected by the user are uploaded.
+      fileQueue.replaceChildren();
 
       function updateQueueCount() {
         const items = fileQueue.querySelectorAll('[data-file-item]');
@@ -164,11 +171,19 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
             errors.push(`"${file.name}" exceeds the 25 MB per-file limit.`);
             return;
           }
+          if (pendingFiles.size >= 10) {
+            errors.push('A maximum of 10 PDFs can be uploaded in one session.');
+            return;
+          }
+          const fileKey = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          if (pendingFiles.has(fileKey)) return;
+          pendingFiles.set(fileKey, file);
           const sizeMb = Math.max(0.1, file.size / (1024 * 1024)).toFixed(1);
           const row = document.createElement('article');
           row.setAttribute('data-file-item', '');
           row.setAttribute('data-file-valid', 'true');
           row.className = 'bg-surface border border-outline rounded-lg p-4 flex flex-col gap-3';
+          row.dataset.fileKey = fileKey;
           row.innerHTML = `
             <div class="flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-3 min-w-0">
@@ -176,13 +191,13 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
                   <i data-lucide="file-text" class="w-4 h-4 text-primary" aria-hidden="true"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
-                  <span class="font-title text-title-md text-on-surface truncate">${file.name}</span>
+                  <span class="font-title text-title-md text-on-surface truncate"></span>
                   <span class="font-mono text-mono-sm text-on-surface-muted tabular-nums">${sizeMb} MB Â· PDF Â· QUEUED</span>
                 </div>
               </div>
               <div class="flex items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-secondary-container text-on-secondary-container border border-secondary font-label text-label-sm">Ready</span>
-                <button type="button" data-remove-file aria-label="Remove ${file.name}" class="p-1.5 rounded border border-outline bg-surface-paper text-on-surface-muted hover:text-error hover:border-error cursor-pointer">
+                <button type="button" data-remove-file class="p-1.5 rounded border border-outline bg-surface-paper text-on-surface-muted hover:text-error hover:border-error cursor-pointer">
                   <i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i>
                 </button>
               </div>
@@ -191,6 +206,8 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
               <div class="h-full bg-secondary w-full"></div>
             </div>
           `;
+          row.querySelector('.font-title').textContent = file.name;
+          row.querySelector('[data-remove-file]').setAttribute('aria-label', `Remove ${file.name}`);
           fileQueue.prepend(row);
         });
         if (errors.length > 0) showValidationError(errors.join(' '));
@@ -217,7 +234,9 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       fileQueue.addEventListener('click', (e) => {
         const removeBtn = e.target.closest('[data-remove-file]');
         if (removeBtn) {
-          removeBtn.closest('[data-file-item]').remove();
+          const row = removeBtn.closest('[data-file-item]');
+          pendingFiles.delete(row.dataset.fileKey);
+          row.remove();
           updateQueueCount();
           return;
         }
@@ -239,8 +258,22 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
         }
       });
 
-      startBtn.addEventListener('click', () => {
-        startFeedback.classList.remove('hidden');
+      startBtn.addEventListener('click', async () => {
+        clearValidationError();
+        const files = Array.from(pendingFiles.values());
+        if (!files.length) return;
+        startBtn.disabled = true;
+        startBtn.querySelector('span').textContent = 'Uploading and extracting…';
+        try {
+          const result = await window.SoulAPI.upload(files);
+          startFeedback.classList.remove('hidden');
+          startFeedback.querySelector('span').textContent = `${result.documents.length} PDF(s) processed; ${result.evidence_count} evidence excerpts indexed. Continue to ask a question.`;
+          window.location.href = 'page06.html';
+        } catch (error) {
+          showValidationError(error.message || 'The upload failed. Please try again.');
+          startBtn.disabled = false;
+          startBtn.querySelector('span').textContent = 'Start Analysis';
+        }
       });
 
       updateQueueCount();
@@ -540,9 +573,4 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
   </div>
 
 
-<script>
-  document.getElementById('start-analysis-btn')?.addEventListener('click', function () {
-    window.location.href = 'page05.html';
-  });
-</script>
 </body></html>

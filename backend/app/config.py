@@ -19,3 +19,5 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://127.0.0.1:5173",
     ]
+    max_upload_bytes: int = 25 * 1024 * 1024
+    max_documents_per_request: int = 10

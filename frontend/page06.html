@@ -113,6 +113,8 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="config.js"></script>
+  <script src="soul-api.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
@@ -131,6 +133,20 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       const claimCards = document.querySelectorAll('[data-claim-card]');
       const visibleCountEl = document.getElementById('visible-claims-count');
       const emptyStateEl = document.getElementById('claims-empty-state');
+      const liveCards = document.getElementById('live-claim-cards');
+      const questionForm = document.getElementById('question-form');
+      const questionInput = document.getElementById('question-input');
+      const answerOutput = document.getElementById('answer-output');
+      const answerMessage = document.getElementById('answer-message');
+      const askButton = document.getElementById('ask-question-btn');
+      const answerError = document.getElementById('answer-error');
+
+      // The original cards are design examples. Live results come only from
+      // the engine response for the uploaded documents in this browser session.
+      document.querySelector('[aria-label="Extracted atomic claims"]')?.replaceChildren();
+      emptyStateEl.classList.remove('hidden');
+      emptyStateEl.querySelector('h2').textContent = 'No verification results yet';
+      emptyStateEl.querySelector('p').textContent = 'Ask a question about the PDFs uploaded for this session.';
 
       function applyFilters() {
         const q = (searchInput.value || '').toLowerCase().trim();
@@ -138,7 +154,7 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
         const revVal = reviewFilter.value;
         let visible = 0;
 
-        claimCards.forEach((card) => {
+        document.querySelectorAll('[data-claim-card]').forEach((card) => {
           const status = card.getAttribute('data-status');
           const doc = card.getAttribute('data-doc');
           const review = card.getAttribute('data-review');
@@ -195,6 +211,100 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       });
 
       applyFilters();
+
+      const docNames = (() => { try { return JSON.parse(localStorage.getItem('soulDocumentNames') || '[]'); } catch (_) { return []; } })();
+      const docIds = window.SoulAPI.getDocumentIds();
+      const docIdByName = {};
+      docNames.forEach((name, index) => {
+        if (docNames.filter((candidate) => candidate === name).length === 1) docIdByName[name] = docIds[index];
+      });
+      const docSelect = document.getElementById('doc-filter');
+      [...new Set(docNames)].forEach((name) => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        docSelect.append(option);
+      });
+
+      function addActualCard({ status, text, citations = [] }) {
+        const card = document.createElement('article');
+        card.className = 'bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-4';
+        card.dataset.claimCard = '';
+        card.dataset.status = status;
+        card.dataset.doc = citations[0]?.filename || 'none';
+        card.dataset.review = 'required';
+        const heading = document.createElement('div');
+        heading.className = 'flex flex-wrap items-center gap-2.5';
+        const badge = document.createElement('span');
+        badge.className = 'px-2.5 py-0.5 rounded border font-label text-label-sm';
+        badge.textContent = status === 'supported' ? 'Supported' : status === 'contradicted' ? 'Contradicted' : 'Insufficient evidence';
+        badge.classList.add(status === 'supported' ? 'border-secondary' : status === 'contradicted' ? 'border-error' : 'border-warning');
+        heading.append(badge);
+        const claim = document.createElement('p');
+        claim.className = 'font-title text-title-md text-on-surface';
+        claim.textContent = text;
+        card.append(heading, claim);
+        citations.forEach((citation) => {
+          const evidence = document.createElement('div');
+          evidence.className = 'bg-surface-container-low border border-outline rounded-md p-4 flex flex-col gap-2';
+          const source = document.createElement('a');
+          source.className = 'font-mono text-mono-sm text-primary hover:text-primary-hover';
+          const documentId = citation.document_id || docIdByName[citation.filename];
+          source.textContent = `${citation.filename} · Page ${citation.page_number}`;
+          if (documentId) {
+            source.href = `${window.SOUL_API_BASE_URL}/soul-ai/documents/${encodeURIComponent(documentId)}/file#page=${citation.page_number}`;
+            source.target = '_blank';
+            source.rel = 'noopener';
+          }
+          const snippet = document.createElement('p');
+          snippet.className = 'font-body text-body-md text-on-surface';
+          snippet.textContent = citation.text || citation.snippet || '';
+          evidence.append(source, snippet);
+          card.append(evidence);
+        });
+        liveCards.append(card);
+      }
+
+      questionForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const question = questionInput.value.trim();
+        if (!question) return;
+        if (!window.SoulAPI.getDocumentIds().length) {
+          answerError.textContent = 'Upload one or more PDFs before asking a question.';
+          answerError.classList.remove('hidden');
+          return;
+        }
+        askButton.disabled = true;
+        askButton.textContent = 'Verifying…';
+        answerError.classList.add('hidden');
+        answerOutput.classList.remove('hidden');
+        answerMessage.textContent = 'Retrieving evidence and independently verifying claims…';
+        liveCards.replaceChildren();
+        try {
+          const payload = await window.SoulAPI.answer(question);
+          const result = payload.data;
+          answerMessage.textContent = result.answer;
+          (result.claims || []).forEach((claim) => addActualCard({ status: 'supported', text: claim.claim_text, citations: claim.evidence || [] }));
+          (result.conflicts || []).forEach((conflict) => {
+            addActualCard({ status: 'contradicted', text: `${conflict.entity} — ${conflict.attribute}: ${conflict.value_1} versus ${conflict.value_2}`, citations: [
+              { filename: conflict.source_1.filename, document_id: conflict.source_1.document_id, page_number: conflict.source_1.page_number, text: conflict.source_1.snippet },
+              { filename: conflict.source_2.filename, document_id: conflict.source_2.document_id, page_number: conflict.source_2.page_number, text: conflict.source_2.snippet },
+            ] });
+          });
+          if (!result.claims?.length && !result.conflicts?.length) {
+            addActualCard({ status: 'unsupported', text: result.answer || 'Insufficient evidence to verify a claim.' });
+          }
+          applyFilters();
+          if (window.lucide) lucide.createIcons();
+        } catch (error) {
+          answerError.textContent = error.message || 'The request failed. Please try again.';
+          answerError.classList.remove('hidden');
+          answerMessage.textContent = '';
+        } finally {
+          askButton.disabled = false;
+          askButton.textContent = 'Verify Question';
+        }
+      });
     });
   </script>
 </head>
@@ -330,14 +440,28 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 
       <main id="results" class="flex-1 p-gutter-md md:p-gutter-lg max-w-7xl w-full mx-auto flex flex-col gap-6">
 
+        <section class="bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-4">
+          <h2 class="font-title text-title-lg text-on-surface">Ask about your uploaded documents</h2>
+          <form id="question-form" class="flex flex-col md:flex-row gap-3">
+            <label class="sr-only" for="question-input">Question</label>
+            <input id="question-input" required maxlength="2000" type="text" placeholder="Ask a question grounded in the uploaded PDFs…" class="flex-1 rounded-md bg-surface border border-outline px-3.5 py-2.5 font-body text-body-md text-on-surface placeholder:text-on-surface-muted focus:border-primary focus:ring-1 focus:ring-primary">
+            <button id="ask-question-btn" type="submit" class="px-5 py-2.5 rounded-md bg-primary text-on-primary hover:bg-primary-hover font-label text-label-lg">Verify Question</button>
+          </form>
+          <p id="answer-error" role="alert" class="hidden text-error font-body text-body-md"></p>
+          <div id="answer-output" class="hidden border-t border-outline pt-4" aria-live="polite">
+            <span class="font-mono text-mono-sm text-on-surface-muted">ENGINE RESPONSE</span>
+            <p id="answer-message" class="mt-2 font-body text-body-md text-on-surface whitespace-pre-line"></p>
+          </div>
+        </section>
+
         <!-- Filter & Tab Bar -->
         <section class="bg-surface-paper border border-outline rounded-lg p-4 flex flex-col gap-4">
           <div class="flex flex-wrap items-center justify-between gap-4 border-b border-outline pb-4">
             <div class="flex flex-wrap items-center gap-2" role="tablist" aria-label="Claim verification status tabs">
-              <button type="button" role="tab" aria-selected="true" data-claim-tab="all" class="px-3 py-1.5 rounded bg-surface-paper border border-outline font-label text-label-sm text-on-surface cursor-pointer">All (6)</button>
-              <button type="button" role="tab" aria-selected="false" data-claim-tab="supported" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Supported (2)</button>
-              <button type="button" role="tab" aria-selected="false" data-claim-tab="contradicted" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Contradicted (2)</button>
-              <button type="button" role="tab" aria-selected="false" data-claim-tab="unsupported" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Unsupported (2)</button>
+              <button type="button" role="tab" aria-selected="true" data-claim-tab="all" class="px-3 py-1.5 rounded bg-surface-paper border border-outline font-label text-label-sm text-on-surface cursor-pointer">All</button>
+              <button type="button" role="tab" aria-selected="false" data-claim-tab="supported" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Supported</button>
+              <button type="button" role="tab" aria-selected="false" data-claim-tab="contradicted" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Contradicted</button>
+              <button type="button" role="tab" aria-selected="false" data-claim-tab="unsupported" class="px-3 py-1.5 rounded border border-transparent font-label text-label-sm text-on-surface-muted hover:text-on-surface cursor-pointer">Unsupported</button>
             </div>
             <span id="visible-claims-count" class="font-mono text-mono-sm text-on-surface-muted tabular-nums">6 CLAIMS SHOWN</span>
           </div>
@@ -370,11 +494,11 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
         <div id="claims-empty-state" class="hidden bg-surface-paper border border-outline rounded-lg p-12 text-center flex flex-col items-center gap-3">
           <i data-lucide="search-x" class="w-8 h-8 text-on-surface-muted" aria-hidden="true"></i>
           <h2 class="font-title text-title-lg text-on-surface">No claims match the active filters</h2>
-          <p class="font-body text-body-md text-on-surface-muted">Clear the search query or switch status tabs to inspect the session claims.</p>
+          <p class="font-body text-body-md text-on-surface-muted">Upload PDFs and ask a question to see claims verified from source evidence.</p>
         </div>
 
         <!-- Claim Cards List -->
-        <section class="flex flex-col gap-4" aria-label="Extracted atomic claims">
+        <section id="live-claim-cards" class="flex flex-col gap-4" aria-label="Extracted atomic claims">
 
           <!-- Claim 1: Supported -->
           <article data-claim-card data-status="supported" data-doc="Q3_Compliance_Filing.pdf" data-review="reviewed" class="bg-surface-paper border border-outline rounded-lg p-5 flex flex-col gap-4">

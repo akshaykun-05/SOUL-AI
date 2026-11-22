@@ -1,25 +1,28 @@
 # SOUL AI Backend
 
-Use Python 3.10 or later. Run the commands below from the repository root with the existing backend virtual environment activated. In PowerShell, activate it with `.\backend\.venv\Scripts\Activate.ps1`. On macOS or Linux, run `source backend/.venv/bin/activate`.
+Use Python 3.10 or later. This FastAPI app mounts the existing `SOUL_AI` engine integration in process. See the repository root `README.md` for complete frontend and backend startup instructions.
 
-## Installation
+## Install
 
-```sh
-python -m pip install -r backend/requirements.txt
+From the repository root:
+
+```powershell
+python -m pip install -r SOUL_AI/requirements.txt -r backend/requirements.txt
+Copy-Item backend/.env.example backend/.env
 ```
 
-The app runs with defaults. To customize it, copy `backend/.env.example` to `backend/.env` and edit it. Set `SOUL_BACKEND_CORS_ORIGINS` to a JSON array of frontend origins, including the scheme and port. The defaults allow localhost and 127.0.0.1 on ports 3000 and 5173. Process environment variables take precedence over the file.
+Set `SOUL_LLM_API_KEY` in `backend/.env` to enable live question answering. Model credentials are read only by the backend. Backend environment variables can also be set in the process environment and take precedence over `.env`.
 
-## Startup
+## Start
 
-```sh
+```powershell
 python -m uvicorn backend.app.main:app --reload
 ```
 
-Open [Swagger UI](http://127.0.0.1:8000/docs) or check [service health](http://127.0.0.1:8000/api/health).
+Open [Swagger UI](http://127.0.0.1:8000/docs) or [service health](http://127.0.0.1:8000/api/health). AI routes are `/api/soul-ai/documents/extract`, `/api/soul-ai/answer`, and `/api/soul-ai/documents/{document_id}/file`.
 
 ## Tests
 
-```sh
+```powershell
 python -m pytest backend/tests
 ```

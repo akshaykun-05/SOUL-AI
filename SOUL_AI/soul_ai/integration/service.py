@@ -29,6 +29,7 @@ class SOULAIEngineService:
         self.retrieval_limit = retrieval_limit
         self._documents: dict[str, dict] = {}
         self._evidence: list[PdfEvidence] = []
+        self._pdf_files: dict[str, tuple[str, bytes]] = {}
 
     @staticmethod
     def _safe_request_id(request_id: str) -> str:
@@ -74,11 +75,16 @@ class SOULAIEngineService:
                     "status": result.status.value, "warnings": result.warnings,
                     "size_bytes": len(upload.bytes()),
                 }
+                self._pdf_files[upload.document_id] = (result.filename, upload.bytes())
                 self._evidence.extend(result.evidence)
             return self._ok(request_id, {"documents": [x.model_dump(mode="json") for x in results],
                                          "evidence_count": sum(len(x.evidence) for x in results)})
         except Exception as exc:
             return self._failure(request_id, exc)
+
+    def get_document_pdf(self, document_id: str) -> tuple[str, bytes] | None:
+        """Return the original uploaded PDF for a citation viewer endpoint."""
+        return self._pdf_files.get(document_id)
 
     def retrieve_evidence(self, request_id: str, question: str,
                           document_ids: Sequence[str] | None = None, limit: int | None = None) -> EngineResult:
