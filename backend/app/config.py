@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     service_name: str = "SOUL AI Backend"
     version: str = "0.1.0"
     cors_origins: list[str] = [
+        "https://soul-ai-dist.vercel.app",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:5173",

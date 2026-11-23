@@ -2,11 +2,11 @@
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-import json
 import os
 
 
 FRONTEND_DIR = Path(__file__).resolve().parent
+API_CONFIG = FRONTEND_DIR.parent / "dist" / "api-config.js"
 
 
 class FrontendHandler(SimpleHTTPRequestHandler):
@@ -15,8 +15,7 @@ class FrontendHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/config.js":
-            api_url = os.environ.get("SOUL_FRONTEND_API_URL", "http://127.0.0.1:8000/api")
-            payload = ("window.SOUL_API_BASE_URL = " + json.dumps(api_url.rstrip("/")) + ";\n").encode()
+            payload = API_CONFIG.read_bytes()
             self.send_response(200)
             self.send_header("Content-Type", "application/javascript; charset=utf-8")
             self.send_header("Cache-Control", "no-store")

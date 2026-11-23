@@ -26,6 +26,7 @@ def test_health(client):
 
 
 @pytest.mark.parametrize("origin, allowed", [
+    ("https://soul-ai-dist.vercel.app", True),
     ("http://localhost:5173", True),
     ("https://example.com", False),
 ])
@@ -36,6 +37,21 @@ def test_health_cors(client, origin, allowed):
     assert response.headers.get("access-control-allow-origin") == (
         origin if allowed else None
     )
+
+
+def test_deployed_frontend_preflight_allows_answer_post(client):
+    response = client.options(
+        "/api/soul-ai/answer",
+        headers={
+            "Origin": "https://soul-ai-dist.vercel.app",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "https://soul-ai-dist.vercel.app"
+    assert "POST" in response.headers["access-control-allow-methods"]
 
 
 def test_swagger_docs(client):

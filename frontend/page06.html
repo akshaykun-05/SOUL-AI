@@ -252,7 +252,7 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
           const documentId = citation.document_id || docIdByName[citation.filename];
           source.textContent = `${citation.filename} · Page ${citation.page_number}`;
           if (documentId) {
-            source.href = `${window.SOUL_API_BASE_URL}/soul-ai/documents/${encodeURIComponent(documentId)}/file#page=${citation.page_number}`;
+            source.href = `${window.SOUL_API_BASE_URL}/api/soul-ai/documents/${encodeURIComponent(documentId)}/file#page=${citation.page_number}`;
             source.target = '_blank';
             source.rel = 'noopener';
           }

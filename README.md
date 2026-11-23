@@ -26,7 +26,7 @@ python -m uvicorn backend.app.main:app --reload
 
 Open the frontend at `http://127.0.0.1:8000/`. The API health endpoint is `http://127.0.0.1:8000/api/health`, and Swagger UI is at `http://127.0.0.1:8000/docs`.
 
-The frontend's `/assets/...` URLs and React routes (for example `/overview`, `/documents`, `/upload`, `/verification`) are served by FastAPI. Direct navigation and refreshes fall back to `dist/index.html`. The small `dist/soul-ai-bridge.js` adapter connects the built upload flow and verification question panel to same-origin `/api/...` routes, so the built app does not need a separate frontend port or CORS configuration for local use.
+The frontend's `/assets/...` URLs and React routes (for example `/overview`, `/documents`, `/upload`, `/verification`) are served by FastAPI. Direct navigation and refreshes fall back to `dist/index.html`. `dist/api-config.js` is the single API base URL setting for the deployed build; `dist/soul-ai-bridge.js` adds `/api` and the backend paths. Set the Render service origin there before deploying the frontend. The older `frontend/soul-api.js` client consumes the same `window.SOUL_API_BASE_URL` setting.
 
 The previous static HTML screens remain available separately at `frontend/page1.html` through `frontend/page11.html`. To run that legacy set with its standalone dev server, use a second terminal:
 
@@ -34,14 +34,9 @@ The previous static HTML screens remain available separately at `frontend/page1.
 python frontend/serve.py
 ```
 
-Open `http://127.0.0.1:3000/page1.html`. To point those legacy pages at another backend, set `SOUL_FRONTEND_API_URL` before starting their server. For example:
+Open `http://127.0.0.1:3000/page1.html`. The legacy server serves the same `dist/api-config.js` setting at `/config.js`, so both frontend versions use the configured Render origin.
 
-```powershell
-$env:SOUL_FRONTEND_API_URL = "http://127.0.0.1:8000/api"
-python frontend/serve.py
-```
-
-The legacy frontend server injects that value through `/config.js`; the browser never receives the model API key. Backend origins are controlled by `SOUL_BACKEND_CORS_ORIGINS` in `backend/.env`.
+The browser never receives the model API key. Backend CORS always allows `https://soul-ai-dist.vercel.app` in addition to configured development origins.
 
 ## Request flow
 

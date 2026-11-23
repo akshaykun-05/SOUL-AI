@@ -1,5 +1,6 @@
 (() => {
-  const API = "/api";
+  const API_BASE = (window.SOUL_API_BASE_URL || "").replace(/\/$/, "");
+  const API = API_BASE ? `${API_BASE}/api` : "";
   const IDS_KEY = "soulDocumentIds";
   const NAMES_KEY = "soulDocumentNames";
   let selectedFiles = [];
@@ -33,6 +34,7 @@
   });
 
   async function apiPost(path, body) {
+    if (!API) throw new Error("The Render backend URL is not configured. Set SOUL_API_BASE_URL in dist/api-config.js and redeploy the frontend.");
     let response;
     try {
       response = await fetch(`${API}${path}`, {

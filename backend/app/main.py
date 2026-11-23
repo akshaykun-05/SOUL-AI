@@ -32,9 +32,13 @@ def create_app(settings: Settings | None = None, engine_service=None) -> FastAPI
         settings = Settings()
 
     app = FastAPI(title=settings.service_name, version=settings.version)
+    allowed_origins = list(dict.fromkeys([
+        *settings.cors_origins,
+        "https://soul-ai-dist.vercel.app",
+    ]))
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origins,
+        allow_origins=allowed_origins,
         allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["*"],
     )

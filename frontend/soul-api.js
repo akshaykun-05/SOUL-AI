@@ -1,17 +1,18 @@
 (function () {
-  const baseUrl = (window.SOUL_API_BASE_URL || "http://127.0.0.1:8000/api").replace(/\/$/, "");
+  const apiBaseUrl = (window.SOUL_API_BASE_URL || "").replace(/\/$/, "");
   const requestId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : `req-${Date.now()}-${Math.random().toString(16).slice(2)}`);
 
   async function request(path, body) {
+    if (!apiBaseUrl) throw new Error("SOUL_API_BASE_URL is not configured for this frontend.");
     let response;
     try {
-      response = await fetch(`${baseUrl}${path}`, {
+      response = await fetch(`${apiBaseUrl}/api${path}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
     } catch (_) {
-      throw new Error(`Could not reach SOUL AI at ${baseUrl}. Check that the backend is running.`);
+      throw new Error(`Could not reach the SOUL AI backend at ${apiBaseUrl}.`);
     }
     let payload;
     try { payload = await response.json(); } catch (_) { payload = {}; }
